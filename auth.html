@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connexion / Inscription — GPALove_heart</title>
+<link rel="icon" href="https://monlogo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .auth-wrap{min-height:calc(100vh - 72px);display:grid;place-items:center;padding:40px 20px;
+    background:radial-gradient(circle at 20% 20%,rgba(124,58,237,.10),transparent 50%),
+    radial-gradient(circle at 80% 80%,rgba(236,72,153,.10),transparent 50%)}
+  .auth-card{background:#fff;border-radius:24px;padding:40px;max-width:520px;width:100%;
+    box-shadow:0 20px 60px rgba(124,58,237,.15);border:1px solid var(--line)}
+  .tabs{display:flex;background:var(--bg-alt);padding:6px;border-radius:14px;margin-bottom:28px}
+  .tabs button{flex:1;padding:12px;border:none;background:transparent;border-radius:10px;
+    font-weight:600;font-size:14.5px;cursor:pointer;color:var(--muted);transition:.2s}
+  .tabs button.active{background:#fff;color:var(--primary);box-shadow:0 4px 12px rgba(124,58,237,.10)}
+  .pane{display:none}
+  .pane.active{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .pane h2{font-size:24px;margin-bottom:8px;text-align:center}
+  .pane > p.sub{color:var(--muted);text-align:center;font-size:14px;margin-bottom:24px}
+  .switch-link{text-align:center;margin-top:20px;font-size:14px;color:var(--muted)}
+  .switch-link a{color:var(--primary);font-weight:600;cursor:pointer}
+  .pwd-info{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .verif-box{text-align:center}
+  .verif-box .icon{font-size:64px;margin-bottom:16px}
+  .code-input{letter-spacing:14px;font-size:24px;text-align:center;font-weight:700;padding:16px}
+  .resend{margin-top:16px;font-size:13px;color:var(--muted);text-align:center}
+  .resend a{color:var(--primary);cursor:pointer;font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="container nav">
+    <a href="index.html" class="logo"><span class="heart">💜</span> GPALove_heart</a>
+    <nav class="nav-links">
+      <a href="index.html">← Retour à l'accueil</a>
+    </nav>
+  </div>
+</header>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <!-- ===== TABS ===== -->
+    <div class="tabs">
+      <button id="tabLogin" class="active" onclick="switchTab('login')">Connexion</button>
+      <button id="tabSignup" onclick="switchTab('signup')">Inscription</button>
+    </div>
+
+    <!-- ===== LOGIN ===== -->
+    <div class="pane active" id="paneLogin">
+      <h2>Bon retour 👋</h2>
+      <p class="sub">Connectez-vous pour accéder à votre espace</p>
+
+      <div class="field">
+        <label>Adresse email</label>
+        <input type="email" id="logEmail" placeholder="vous@exemple.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="logPwd" placeholder="••••••" autocomplete="current-password">
+      </div>
+
+      <button class="btn btn-primary btn-block btn-lg" onclick="doLogin()" id="btnLoginSubmit">
+        Se connecter →
+      </button>
+
+      <p class="switch-link">Pas encore de compte ? <a onclick="switchTab('signup')">Inscrivez-vous</a></p>
+    </div>
+
+    <!-- ===== SIGNUP ===== -->
+    <div class="pane" id="paneSignup">
+      <h2>Créer un compte</h2>
+      <p class="sub">Rejoignez GPALove_heart en 30 secondes</p>
+
+      <div class="field">
+        <label>Nom complet *</label>
+        <input type="text" id="regNom" placeholder="Ex : Awa Ndongo" autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label>Adresse email *</label>
+        <input type="email" id="regEmail" placeholder="vous@exemple.com" autocomplete="email">
+      </div>
+
+      <div class="field">
+        <label>Numéro de téléphone *</label>
+        <div class="phone-group">
+          <span class="prefix">+237</span>
+          <input type="tel" id="regTel" maxlength="9" placeholder="6XXXXXXXX" inputmode="numeric">
+        </div>
+        <div class="pwd-info">Doit commencer par 6 et contenir 9 chiffres</div>
+      </div>
+
+      <div class="field">
+        <label>Mot de passe *</label>
+        <input type="password" id="regPwd" placeholder="••••••" autocomplete="new-password">
+        <div class="pwd-info">Minimum 6 caractères, avec au moins 1 chiffre et 1 caractère spécial (!@#$%...)</div>
+      </div>
+
+      <label style="display:flex;gap:10px;font-size:13px;color:var(--muted);align-items:flex-start;margin:18px 0">
+        <input type="checkbox" id="regCGU" style="width:auto;margin-top:4px">
+        <span>Je reconnais avoir lu et accepté les <a href="cgu.html" target="_blank" style="color:var(--primary);font-weight:600">Conditions Générales d'Utilisation</a> et la <a href="cgu.html" target="_blank" style="color:var(--primary);font-weight:600">Politique de confidentialité</a>.</span>
+      </label>
+
+      <button class="btn btn-primary btn-block btn-lg" onclick="doSignup()" id="btnSignupSubmit">
+        Créer mon compte →
+      </button>
+
+      <p class="switch-link">Déjà inscrit ? <a onclick="switchTab('login')">Connectez-vous</a></p>
+    </div>
+
+    <!-- ===== VERIFICATION ===== -->
+    <div class="pane" id="paneVerif">
+      <div class="verif-box">
+        <div class="icon">📧</div>
+        <h2>Vérifiez votre email</h2>
+        <p class="sub">Un code à 6 chiffres a été envoyé à <b id="verifEmail"></b>.<br>Vérifiez aussi vos spams.</p>
+      </div>
+
+      <div class="field">
+        <label>Code de vérification</label>
+        <input type="text" id="verifCode" maxlength="6" placeholder="000000" inputmode="numeric" class="code-input">
+      </div>
+
+      <button class="btn btn-primary btn-block btn-lg" onclick="doVerify()" id="btnVerifSubmit">
+        Vérifier mon compte
+      </button>
+
+      <p class="resend">
+        Vous n'avez rien reçu ? <a onclick="resendCode()">Renvoyer le code</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="api.js"></script>
+<script>
+let pendingEmail = '';
+
+/* ===== Initial : si hash #signup ou ?signup ===== */
+const params = new URLSearchParams(location.search);
+if (location.hash === '#signup' || params.get('signup')) switchTab('signup');
+
+/* ===== Tabs ===== */
+function switchTab(t) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  if (t === 'signup') {
+    document.getElementById('paneSignup').classList.add('active');
+    document.getElementById('tabSignup').classList.add('active');
+  } else {
+    document.getElementById('paneLogin').classList.add('active');
+    document.getElementById('tabLogin').classList.add('active');
+  }
+}
+
+/* ===== LOGIN ===== */
+async function doLogin() {
+  const email = document.getElementById('logEmail').value.trim();
+  const pwd = document.getElementById('logPwd').value;
+  if (!validateEmail(email)) return toast('Email invalide', 'error');
+  if (!pwd) return toast('Entrez votre mot de passe', 'error');
+
+  const btn = document.getElementById('btnLoginSubmit');
+  btn.disabled = true; btn.textContent = 'Connexion...';
+
+  try {
+    const data = await apiLogin(email, pwd);
+    toast('Bienvenue ' + (data.user?.nom || '') + ' !', 'success');
+    setTimeout(() => {
+      if (data.user?.isAdmin) location.href = 'admin.html';
+      else location.href = 'dashboard.html';
+    }, 700);
+  } catch (e) {
+    toast(e.message, 'error');
+    btn.disabled = false; btn.textContent = 'Se connecter →';
+  }
+}
+
+/* ===== SIGNUP ===== */
+async function doSignup() {
+  const nom = document.getElementById('regNom').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const tel = document.getElementById('regTel').value.trim();
+  const pwd = document.getElementById('regPwd').value;
+  const cgu = document.getElementById('regCGU').checked;
+
+  if (!nom) return toast('Nom complet requis', 'error');
+  if (!validateEmail(email)) return toast('Email invalide', 'error');
+  if (!validatePhone(tel)) return toast('Numéro : 6 + 8 chiffres (ex: 690123456)', 'error');
+  if (!validatePassword(pwd)) return toast('Mot de passe : 6+ car., 1 chiffre, 1 caractère spécial', 'error');
+  if (!cgu) return toast('Vous devez accepter les CGU', 'error');
+
+  const btn = document.getElementById('btnSignupSubmit');
+  btn.disabled = true; btn.textContent = 'Création du compte...';
+
+  try {
+    const data = await apiRegister({ nom, email, tel, password: pwd });
+    pendingEmail = email;
+    document.getElementById('verifEmail').textContent = email;
+    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('paneVerif').classList.add('active');
+    document.querySelectorAll('.tabs').forEach(t => t.style.display = 'none');
+    toast('Code envoyé ! Vérifiez votre email.', 'success');
+    setTimeout(() => document.getElementById('verifCode').focus(), 300);
+  } catch (e) {
+    toast(e.message, 'error');
+    btn.disabled = false; btn.textContent = 'Créer mon compte →';
+  }
+}
+
+/* ===== VERIFY ===== */
+async function doVerify() {
+  const code = document.getElementById('verifCode').value.trim();
+  if (code.length !== 6) return toast('Le code doit contenir 6 chiffres', 'error');
+
+  const btn = document.getElementById('btnVerifSubmit');
+  btn.disabled = true; btn.textContent = 'Vérification...';
+
+  try {
+    const data = await apiVerify(pendingEmail, code);
+    toast('Compte vérifié ! Bienvenue 🎉', 'success');
+    setTimeout(() => {
+      if (data.user?.isAdmin) location.href = 'admin.html';
+      else location.href = 'dashboard.html';
+    }, 900);
+  } catch (e) {
+    toast(e.message, 'error');
+    btn.disabled = false; btn.textContent = 'Vérifier mon compte';
+  }
+}
+
+/* ===== RESEND ===== */
+async function resendCode() {
+  if (!pendingEmail) return toast('Erreur : email introuvable', 'error');
+  try {
+    await apiResendCode(pendingEmail);
+    toast('Nouveau code envoyé !', 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+/* ===== Format téléphone (que des chiffres) ===== */
+document.getElementById('regTel').addEventListener('input', (e) => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+});
+
+/* ===== Auto-diriger si déjà connecté ===== */
+if (getToken()) {
+  const u = getCachedUser();
+  if (u?.isAdmin) location.href = 'admin.html';
+  else location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>
