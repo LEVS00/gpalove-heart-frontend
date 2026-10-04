@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mon espace — GPALove_heart</title>
+<link rel="icon" href="https://monlogo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .user-chip{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;background:var(--bg-alt);border-radius:30px}
+  .user-chip .avatar{width:32px;height:32px;border-radius:50%;background:var(--gradient);color:#fff;
+    display:grid;place-items:center;font-weight:700;font-size:14px}
+  .user-chip .name{font-size:13.5px;font-weight:600;color:var(--text)}
+  @media(max-width:640px){.user-chip .name{display:none}}
+
+  .quick-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-top:24px}
+  .quick-stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;
+    box-shadow:var(--shadow-sm);transition:.25s}
+  .quick-stat:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .quick-stat .icon{font-size:28px;margin-bottom:8px}
+  .quick-stat .value{font-size:26px;font-weight:800;color:var(--primary);line-height:1}
+  .quick-stat .label{font-size:12.5px;color:var(--muted);margin-top:6px}
+
+  .section-head{display:flex;justify-content:space-between;align-items:center;margin:32px 0 16px;flex-wrap:wrap;gap:10px}
+  .section-head h3{font-size:20px;font-weight:800;margin:0}
+  .section-head a{font-size:13.5px;color:var(--primary);font-weight:600}
+
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+  .empty-state .icon{font-size:52px;margin-bottom:12px;opacity:.5}
+
+  .stat-hero{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;
+    box-shadow:var(--shadow-sm)}
+  .stat-hero h4{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;
+    font-weight:700;margin-bottom:10px}
+  .stat-hero .value{font-size:32px;font-weight:900;color:var(--primary);line-height:1}
+  .stat-hero .sub{font-size:12.5px;color:var(--muted);margin-top:6px}
+
+  .dstep ul{list-style:none;padding:0}
+  .dstep ul li{position:relative;padding-left:26px;margin-bottom:8px}
+  .dstep ul li::before{content:'✓';position:absolute;left:0;top:0;color:var(--success);font-weight:800}
+
+  .operator-opt{display:flex;gap:10px;align-items:center;padding:14px;border:1.5px solid var(--line);
+    border-radius:12px;cursor:pointer;transition:.2s;flex:1}
+  .operator-opt:hover{border-color:var(--primary-light)}
+  .operator-opt input{width:auto!important}
+  .operator-opt.selected{border-color:var(--primary);background:var(--bg-alt)}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site">
+  <div class="container nav">
+    <a href="dashboard.html" class="logo"><span class="heart">💜</span> GPALove_heart</a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="dashboard.html" class="active">Mon espace</a>
+      <a href="index.html">Accueil</a>
+      <a href="formations.html">Formations</a>
+      <a href="cgu.html">CGU</a>
+    </nav>
+
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="user-chip">
+        <div class="avatar" id="hdrAvatar">?</div>
+        <span class="name" id="hdrName">Utilisateur</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="apiLogout()">Déconnexion</button>
+      <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     DASHBOARD
+     ============================================================ -->
+<div class="container dash">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="item active" data-tab="home">🏠 Accueil</div>
+    <div class="item" data-tab="stats">📊 Statistiques</div>
+    <div class="item" data-tab="invest">💼 Investissements</div>
+    <div class="item" data-tab="don">❤️ Dons</div>
+    <div class="item" data-tab="bonus">🎁 Bonus</div>
+    <div class="item" data-tab="tx">💳 Transactions</div>
+    <div class="item" data-tab="settings">⚙️ Paramètres</div>
+  </aside>
+
+  <main>
+
+    <!-- ============================================================
+         TAB : ACCUEIL
+         ============================================================ -->
+    <div class="tab-content active" id="tab-home">
+
+      <!-- Carte solde principale -->
+      <div class="balance-card">
+        <div style="font-size:13px;opacity:.85">Solde Principal</div>
+        <div class="balance-value" id="balanceVal">0.00 π</div>
+        <div style="font-size:13px;opacity:.85">≈ <span id="balanceXAF">0</span> XAF</div>
+        <div class="float-actions">
+          <button class="fab" title="Dépôt" onclick="openDepositFlow()">＋</button>
+          <button class="fab" title="Retrait" onclick="openWithdraw()">－</button>
+        </div>
+      </div>
+
+      <!-- Statistiques rapides -->
+      <div class="quick-stats">
+        <div class="quick-stat">
+          <div class="icon">💼</div>
+          <div class="value" id="invCount">0</div>
+          <div class="label">Investissements actifs</div>
+        </div>
+        <div class="quick-stat">
+          <div class="icon">❤️</div>
+          <div class="value" id="donCount">0</div>
+          <div class="label">Dons effectués</div>
+        </div>
+        <div class="quick-stat">
+          <div class="icon">⏱️</div>
+          <div class="value" id="onlineTime">0 h</div>
+          <div class="label">Temps en ligne</div>
+        </div>
+        <div class="quick-stat">
+          <div class="icon">🏆</div>
+          <div class="value" id="proStatus">Standard</div>
+          <div class="label">Statut du compte</div>
+        </div>
+      </div>
+
+      <!-- Campagnes recommandées -->
+      <div class="section-head">
+        <h3>💡 Campagnes recommandées</h3>
+        <a onclick="document.querySelector('[data-tab=invest]').click()">Voir tout →</a>
+      </div>
+      <div class="grid grid-3" id="dashCampaigns">
+        <div class="loader"></div>
+      </div>
+
+      <!-- Aperçu dernières transactions -->
+      <div class="section-head">
+        <h3>💳 Dernières transactions</h3>
+        <a onclick="document.querySelector('[data-tab=tx]').click()">Voir tout →</a>
+      </div>
+      <div class="card">
+        <table id="lastTxTable">
+          <thead><tr><th>ID</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB : STATISTIQUES
+         ============================================================ -->
+    <div class="tab-content" id="tab-stats">
+      <h2 style="margin-bottom:24px">📊 Statistiques analytiques</h2>
+
+      <div class="grid grid-3" style="margin-bottom:24px">
+        <div class="stat-hero">
+          <h4>Revenus totaux générés</h4>
+          <div class="value" id="stRevenue">0 π</div>
+          <div class="sub">Depuis votre inscription</div>
+        </div>
+        <div class="stat-hero">
+          <h4>Transactions réussies</h4>
+          <div class="value" id="stTxOk">0</div>
+          <div class="sub">Dépôts, retraits, dons, bonus</div>
+        </div>
+        <div class="stat-hero">
+          <h4>Temps total en ligne</h4>
+          <div class="value" id="stOnline">0 h</div>
+          <div class="sub">Depuis votre inscription</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <h3 style="margin-bottom:16px">Évolution des revenus (7 derniers jours)</h3>
+        <canvas id="chartMain" height="90"></canvas>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="stat-hero">
+          <h4>Investissements en attente</h4>
+          <div class="value" id="stInvPending">0</div>
+          <div class="sub">Paiements à venir</div>
+        </div>
+        <div class="stat-hero">
+          <h4>Investissements payés</h4>
+          <div class="value" id="stInvPaid">0</div>
+          <div class="sub">Déjà crédités sur votre solde</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB : INVESTISSEMENTS
+         ============================================================ -->
+    <div class="tab-content" id="tab-invest">
+      <h2 style="margin-bottom:20px">💼 Opportunités d'investissement</h2>
+
+      <!-- Catégories -->
+      <div class="cat-scroll">
+        <button class="cat-pill active" data-ic="all">Tout</button>
+        <button class="cat-pill" data-ic="jour">Jour</button>
+        <button class="cat-pill" data-ic="semaine">Semaine</button>
+        <button class="cat-pill" data-ic="mois">Mois</button>
+        <button class="cat-pill" data-ic="année">Année</button>
+      </div>
+
+      <div class="grid grid-3" id="investList">
+        <div class="loader"></div>
+      </div>
+
+      <div class="section-head">
+        <h3>📋 Mes investissements</h3>
+      </div>
+      <div class="card">
+        <table id="myInvTable">
+          <thead><tr><th>Campagne</th><th>Montant</th><th>Échéance</th><th>Statut</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB : DONS
+         ============================================================ -->
+    <div class="tab-content" id="tab-don">
+      <h2 style="margin-bottom:12px">❤️ Faire un don</h2>
+      <p style="color:var(--muted);margin-bottom:26px;font-size:15px">
+        Le montant demandé est immédiatement déduit de votre solde principal. Vous recevrez des intérêts sur la période définie par la campagne.
+      </p>
+
+      <div class="grid grid-3" id="donList">
+        <div class="loader"></div>
+      </div>
+
+      <div class="section-head">
+        <h3>📜 Historique de mes dons</h3>
+      </div>
+      <div class="card">
+        <table id="donTable">
+          <thead><tr><th>Campagne</th><th>Montant</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB : BONUS
+         ============================================================ -->
+    <div class="tab-content" id="tab-bonus">
+      <h2 style="margin-bottom:24px">🎁 Bonus mensuel</h2>
+
+      <div class="card" style="text-align:center;padding:50px 30px;background:var(--gradient-soft)">
+        <div style="font-size:80px;margin-bottom:16px">🎁</div>
+        <h3 style="font-size:22px;margin-bottom:12px">Cadeau utilisateur Pro</h3>
+        <p style="margin:12px auto 26px;max-width:440px;color:var(--text-soft);font-size:15px">
+          En tant qu'utilisateur professionnel, vous pouvez réclamer <b>0,1 π offerts</b> chaque mois pour vous remercier de votre fidélité.
+        </p>
+        <button class="btn btn-primary btn-lg" id="claimBonusBtn" onclick="doClaimBonus()">
+          🎁 Réclamer mon cadeau
+        </button>
+        <p style="margin-top:18px;font-size:13px;color:var(--muted)">Un seul cadeau par mois.</p>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB : TRANSACTIONS
+         ============================================================ -->
+    <div class="tab-content" id="tab-tx">
+      <h2 style="margin-bottom:20px">💳 Historique des transactions</h2>
+
+      <div class="cat-scroll" style="margin-bottom:16px">
+        <button class="cat-pill active" data-txf="all">Toutes</button>
+        <button class="cat-pill" data-txf="deposit">Dépôts</button>
+        <button class="cat-pill" data-txf="withdraw">Retraits</button>
+        <button class="cat-pill" data-txf="donation">Dons</button>
+        <button class="cat-pill" data-txf="bonus">Bonus</button>
+        <button class="cat-pill" data-txf="gift">Cadeaux</button>
+      </div>
+
+      <div class="card">
+        <table id="txTable">
+          <thead><tr><th>ID</th><th>Type</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB : PARAMÈTRES
+         ============================================================ -->
+    <div class="tab-content" id="tab-settings">
+      <h2 style="margin-bottom:24px">⚙️ Paramètres</h2>
+
+      <!-- Profil -->
+      <div class="card" style="margin-bottom:18px">
+        <h3 style="margin-bottom:16px">👤 Informations du profil</h3>
+        <div class="field"><label>Nom complet</label><input id="setNom"></div>
+        <div class="field"><label>Adresse email</label><input id="setEmail" disabled style="background:var(--bg-alt);color:var(--muted)"></div>
+        <div class="field"><label>Numéro de téléphone</label><input id="setTel" disabled style="background:var(--bg-alt);color:var(--muted)"></div>
+        <button class="btn btn-primary" onclick="saveProfile()">💾 Enregistrer</button>
+      </div>
+
+      <!-- Sécurité -->
+      <div class="card" style="margin-bottom:18px">
+        <h3 style="margin-bottom:12px">🔒 Sécurité</h3>
+        <p style="color:var(--muted);font-size:14.5px;margin-bottom:16px">
+          Pour changer votre mot de passe, contactez l'administration via la rubrique ci-dessous.
+        </p>
+        <button class="btn btn-ghost" onclick="toast('Fonction à venir','warn')">Changer mon mot de passe</button>
+      </div>
+
+      <!-- Conditions -->
+      <div class="card" style="margin-bottom:18px">
+        <h3 style="margin-bottom:12px">📄 Conditions & Politique</h3>
+        <p style="color:var(--muted);font-size:14.5px;margin-bottom:16px">
+          Consultez les Conditions Générales d'Utilisation et la Politique de confidentialité.
+        </p>
+        <a href="cgu.html" class="btn btn-ghost">Lire les CGU →</a>
+      </div>
+
+      <!-- Signalement -->
+      <div class="card" style="margin-bottom:18px">
+        <h3 style="margin-bottom:12px">🚨 Signaler un problème</h3>
+        <p style="color:var(--muted);font-size:14.5px;margin-bottom:16px">
+          Un bug ? Une transaction suspecte ? Un comportement abusif ? Décrivez votre problème — notre équipe vous répondra sous 24h.
+        </p>
+        <div class="field">
+          <textarea id="reportMsg" rows="4" placeholder="Décrivez votre problème en détail..."></textarea>
+        </div>
+        <button class="btn btn-danger" onclick="sendReport()">📩 Envoyer le signalement</button>
+      </div>
+
+      <!-- Déconnexion -->
+      <div class="card" style="border-color:var(--danger)">
+        <h3 style="margin-bottom:12px;color:var(--danger)">🚪 Déconnexion</h3>
+        <p style="color:var(--muted);font-size:14.5px;margin-bottom:16px">
+          Vous serez redirigé vers la page d'accueil.
+        </p>
+        <button class="btn btn-danger" onclick="apiLogout()">Me déconnecter</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     MODAL : DÉPÔT
+     ============================================================ -->
+<div class="overlay" id="depositModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('depositModal')">×</button>
+
+    <!-- Étape 1 : Montant -->
+    <div class="dstep">
+      <h3>💰 Recharger mon compte</h3>
+      <p style="color:var(--muted);margin-bottom:20px">
+        Minimum : <b>0,5 π = 3 000 XAF</b> (1 π = 6 000 XAF)
+      </p>
+      <div class="field">
+        <label>Montant à recharger (en π)</label>
+        <input id="depAmount" type="number" step="0.1" min="0.5" placeholder="Ex : 5">
+      </div>
+      <div style="background:var(--bg-alt);padding:14px;border-radius:12px;margin-bottom:18px;font-size:14px" id="depPreview">
+        Saisissez un montant pour voir la conversion
+      </div>
+      <button class="btn btn-primary btn-block" onclick="depositStep2()">Continuer →</button>
+    </div>
+
+    <!-- Étape 2 : Consignes -->
+    <div class="dstep" style="display:none">
+      <h3>⚠️ Consignes importantes</h3>
+      <ul style="margin:20px 0;color:var(--text-soft);line-height:1.9;font-size:14.5px">
+        <li>Montant minimum : <b>0,5 π = 3 000 XAF</b></li>
+        <li>Après paiement, vous recevrez un <b>identifiant de transaction</b></li>
+        <li>Conservez ou copiez cet identifiant — il est <b>indispensable</b> pour valider</li>
+        <li>Toute tentative de fraude entraîne une <b>suspension de 24h</b></li>
+      </ul>
+      <div id="depSummary" style="background:var(--bg-alt);padding:16px;border-radius:12px;margin-bottom:18px;font-size:14.5px"></div>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-bottom:18px;cursor:pointer">
+        <input type="checkbox" id="depReadCheck" style="width:auto;margin-top:4px">
+        <span>J'ai lu et compris toutes les consignes ci-dessus</span>
+      </label>
+      <button class="btn btn-primary btn-block" id="depContinueBtn" onclick="depositStep3()" disabled>Continuer →</button>
+    </div>
+
+    <!-- Étape 3 : Redirection -->
+    <div class="dstep" style="display:none">
+      <h3>🔒 Redirection sécurisée</h3>
+      <p style="color:var(--muted);margin:20px 0;font-size:14.5px;line-height:1.7">
+        Vous allez être redirigé vers notre prestataire de paiement sécurisé.
+        Une fois la transaction effectuée, revenez sur cette page pour saisir votre identifiant de transaction.
+      </p>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-bottom:18px;cursor:pointer">
+        <input type="checkbox" id="depReadCheck2" style="width:auto;margin-top:4px">
+        <span>Je confirme avoir lu les consignes et j'accepte d'être redirigé</span>
+      </label>
+      <button class="btn btn-primary btn-block" onclick="depositStep4()">Aller au paiement sécurisé →</button>
+    </div>
+
+    <!-- Étape 4 : Validation -->
+    <div class="dstep" style="display:none">
+      <h3>✅ Valider ma recharge</h3>
+      <p style="color:var(--muted);margin-bottom:20px;font-size:14.5px;line-height:1.7">
+        Saisissez l'identifiant de transaction reçu (SMS ou page de succès du paiement).
+      </p>
+      <div class="field">
+        <label>Identifiant de transaction</label>
+        <input id="depTxId" placeholder="Ex : TXN-8874562">
+      </div>
+      <button class="btn btn-success btn-block" onclick="depositValidate()">✅ Valider ma recharge</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL : RETRAIT
+     ============================================================ -->
+<div class="overlay" id="withdrawModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('withdrawModal')">×</button>
+    <h3>💸 Demander un retrait</h3>
+    <p style="color:var(--muted);margin-bottom:20px;font-size:14px">
+      Votre demande sera examinée par l'administrateur sous 24h.
+    </p>
+
+    <div class="field">
+      <label>Opérateur Mobile Money</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <label class="operator-opt" onclick="selectOperator(this)">
+          <input type="radio" name="operator" value="MTN">
+          <div><b>MTN MoMo</b></div>
+        </label>
+        <label class="operator-opt" onclick="selectOperator(this)">
+          <input type="radio" name="operator" value="OM">
+          <div><b>Orange Money</b></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Numéro Mobile Money</label>
+      <input id="wdNumber" maxlength="9" placeholder="6XXXXXXXX" inputmode="numeric">
+    </div>
+
+    <div class="field">
+      <label>Montant à retirer (π)</label>
+      <input id="wdAmount" type="number" step="0.1" placeholder="Ex : 1.0">
+    </div>
+
+    <div style="background:var(--bg-alt);padding:12px;border-radius:10px;margin-bottom:16px;font-size:13.5px;color:var(--muted)">
+      Solde disponible : <b id="wdAvailable">0 π</b>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="submitWithdraw()">Soumettre à l'administrateur</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="api.js"></script>
+<script>
+/* ===== Guard : utilisateur connecté ? ===== */
+const user = requireAuth();
+if (!user) throw new Error('redirect');
+if (user.isAdmin) location.href = 'admin.html';
+
+/* ===== Tabs ===== */
+document.querySelectorAll('.sidebar .item').forEach(it => {
+  it.onclick = () => {
+    document.querySelectorAll('.sidebar .item').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    it.classList.add('active');
+    document.getElementById('tab-' + it.dataset.tab).classList.add('active');
+    if (it.dataset.tab === 'stats') renderChart();
+  };
+});
+
+/* ===== Helpers ===== */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function selectOperator(el) {
+  document.querySelectorAll('.operator-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ============================================================
+   DÉPÔT
+   ============================================================ */
+function openDepositFlow() {
+  const m = document.getElementById('depositModal');
+  m.classList.add('open');
+  document.querySelectorAll('#depositModal .dstep').forEach((s, i) => s.style.display = i === 0 ? 'block' : 'none');
+  document.getElementById('depReadCheck').checked = false;
+  document.getElementById('depReadCheck2').checked = false;
+  document.getElementById('depContinueBtn').disabled = true;
+  document.getElementById('depTxId').value = '';
+}
+
+document.getElementById('depAmount').addEventListener('input', (e) => {
+  const v = parseFloat(e.target.value);
+  const prev = document.getElementById('depPreview');
+  if (!v || v < 0.5) {
+    prev.innerHTML = 'Saisissez un montant pour voir la conversion';
+  } else {
+    prev.innerHTML = `<b>${v} π</b> = <b>${fmtXAF(v)}</b>`;
+  }
+});
+
+function depositStep2() {
+  const amount = parseFloat(document.getElementById('depAmount').value);
+  if (!amount || amount < MIN_DEPOSIT_PI) {
+    return toast(`Le montant minimum est 0.5 π (${MIN_DEPOSIT_PI * PI_TO_XAF} XAF)`, 'error');
+  }
+  document.getElementById('depSummary').innerHTML =
+    `Montant à créditer : <b>${amount} π</b><br>Équivalent : <b>${fmtXAF(amount)}</b>`;
+  document.querySelectorAll('#depositModal .dstep').forEach((s, i) => s.style.display = i === 1 ? 'block' : 'none');
+}
+
+function depositStep3() {
+  if (!document.getElementById('depReadCheck').checked) return toast('Lisez et acceptez les consignes', 'error');
+  document.querySelectorAll('#depositModal .dstep').forEach((s, i) => s.style.display = i === 2 ? 'block' : 'none');
+}
+
+function depositStep4() {
+  if (!document.getElementById('depReadCheck2').checked) return toast('Confirmez avoir lu les consignes', 'error');
+  window.open('https://monliendepaiement.com', '_blank');
+  document.querySelectorAll('#depositModal .dstep').forEach((s, i) => s.style.display = i === 3 ? 'block' : 'none');
+}
+
+async function depositValidate() {
+  const txid = document.getElementById('depTxId').value.trim();
+  const amount = parseFloat(document.getElementById('depAmount').value);
+  if (txid.length < 5) return toast('Identifiant de transaction invalide', 'error');
+  try {
+    await apiDeposit(amount, txid);
+    toast('Demande enregistrée. Validation sous 24h.', 'success');
+    closeModal('depositModal');
+    refreshUI(); renderTx(); renderLastTx();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   RETRAIT
+   ============================================================ */
+function openWithdraw() {
+  document.getElementById('wdAvailable').textContent = document.getElementById('balanceVal').textContent;
+  document.getElementById('withdrawModal').classList.add('open');
+}
+
+async function submitWithdraw() {
+  const op = document.querySelector('input[name=operator]:checked')?.value;
+  const num = document.getElementById('wdNumber').value.trim();
+  const amount = parseFloat(document.getElementById('wdAmount').value);
+  if (!op) return toast('Choisissez un opérateur', 'error');
+  if (!validatePhone(num)) return toast('Numéro invalide (6XXXXXXXX)', 'error');
+  if (!amount || amount <= 0) return toast('Montant invalide', 'error');
+  try {
+    await apiWithdraw(amount, op, num);
+    toast('Demande de retrait prise en compte', 'success');
+    closeModal('withdrawModal');
+    document.querySelector('input[name=operator]:checked').checked = false;
+    document.querySelectorAll('.operator-opt').forEach(o => o.classList.remove('selected'));
+    document.getElementById('wdNumber').value = '';
+    document.getElementById('wdAmount').value = '';
+    refreshUI(); renderTx(); renderLastTx();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   REFRESH UI
+   ============================================================ */
+async function refreshUI() {
+  try {
+    const u = await apiGetMe();
+    document.getElementById('balanceVal').textContent = fmtPi(u.balance);
+    document.getElementById('balanceXAF').textContent = fmtXAF(u.balance).replace(' XAF', '');
+    document.getElementById('invCount').textContent = (u.investments || []).filter(i => i.status === 'pending').length;
+    document.getElementById('donCount').textContent = (u.donations || []).length;
+    document.getElementById('onlineTime').textContent = ((u.onlineMs || 0) / 3600000).toFixed(1) + ' h';
+    document.getElementById('proStatus').textContent = u.isPro ? '⭐ Pro' : 'Standard';
+
+    document.getElementById('setNom').value = u.nom || '';
+    document.getElementById('setEmail').value = u.email || '';
+    document.getElementById('setTel').value = u.tel || '';
+
+    document.getElementById('stRevenue').textContent = fmtPi(
+      (u.investments || []).filter(i => i.status === 'paid').reduce((s, i) => s + i.amount, 0)
+    );
+    document.getElementById('stTxOk').textContent = (u.transactions || []).filter(t => t.status === 'success').length;
+    document.getElementById('stOnline').textContent = ((u.onlineMs || 0) / 3600000).toFixed(2) + ' h';
+    document.getElementById('stInvPending').textContent = (u.investments || []).filter(i => i.status === 'pending').length;
+    document.getElementById('stInvPaid').textContent = (u.investments || []).filter(i => i.status === 'paid').length;
+
+    // Header avatar
+    const initial = (u.nom || 'U').charAt(0).toUpperCase();
+    document.getElementById('hdrAvatar').textContent = initial;
+    document.getElementById('hdrName').textContent = (u.nom || 'Utilisateur').split(' ')[0];
+  } catch (e) { console.error(e); }
+}
+
+/* ============================================================
+   CAMPAGNES
+   ============================================================ */
+async function renderCampaigns(boxId, cat = 'all') {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  box.innerHTML = '<div class="loader"></div>';
+  try {
+    const list = await apiGetCampaigns(cat);
+    if (!list.length) {
+      box.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">📭</div><p>Aucune campagne disponible pour cette catégorie.</p></div>';
+      return;
+    }
+    box.innerHTML = list.map(c => `
+      <div class="campaign-card">
+        <div class="top">🏥</div>
+        <div class="body">
+          <h4>${c.company}</h4>
+          <p class="desc">${c.description}</p>
+          <div class="gain">
+            <div><b>${c.amountAsked} π</b><div style="font-size:12px;color:var(--muted)">à donner</div></div>
+            <div style="text-align:right"><b>${c.returnAmount} π</b><div style="font-size:12px;color:var(--muted)">à recevoir</div></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+            <span class="badge badge-pending">${c.category}</span> · ${c.durationDays} jour(s) · ${c.donors} donateur(s)
+          </div>
+          <button class="btn btn-primary btn-block" onclick="doDonate('${c.id}')">Donner ${c.amountAsked} π</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    box.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1;padding:30px">Chargement impossible. Réessayez.</p>';
+  }
+}
+
+async function doDonate(id) {
+  if (!confirm('Confirmez-vous ce don ? Le montant sera immédiatement déduit de votre solde.')) return;
+  try {
+    const res = await apiDonate(id);
+    toast(res.message, 'success');
+    refreshUI(); renderMyInv(); renderTx(); renderLastTx(); renderDonations();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   MES INVESTISSEMENTS
+   ============================================================ */
+async function renderMyInv() {
+  const tb = document.querySelector('#myInvTable tbody');
+  if (!tb) return;
+  const u = await apiGetMe();
+  const list = (u.investments || []).slice(-30).reverse();
+  tb.innerHTML = list.length ? list.map(i => `
+    <tr>
+      <td>${i.campaignId}</td>
+      <td style="font-weight:700;color:var(--primary)">${fmtPi(i.amount)}</td>
+      <td>${dateStr(i.dueAt)}</td>
+      <td><span class="badge badge-${i.status === 'paid' ? 'success' : 'pending'}">${i.status === 'paid' ? 'Payé' : 'En attente'}</span></td>
+    </tr>
+  `).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px">Aucun investissement pour le moment</td></tr>';
+}
+
+/* ============================================================
+   DONS
+   ============================================================ */
+async function renderDonations() {
+  const tb = document.querySelector('#donTable tbody');
+  if (!tb) return;
+  const u = await apiGetMe();
+  const list = (u.donations || []).slice().reverse();
+  tb.innerHTML = list.length ? list.map(d => `
+    <tr>
+      <td>${d.campaignId}</td>
+      <td style="font-weight:700;color:var(--secondary)">${fmtPi(d.amount)}</td>
+      <td>${dateStr(d.date)}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:30px">Aucun don effectué</td></tr>';
+}
+
+/* ============================================================
+   TRANSACTIONS
+   ============================================================ */
+async function renderTx(filter = 'all') {
+  const tb = document.querySelector('#txTable tbody');
+  if (!tb) return;
+  try {
+    const list = await apiGetTransactions();
+    const filtered = filter === 'all' ? list : list.filter(t => t.type === filter);
+    tb.innerHTML = filtered.length ? filtered.slice(0, 50).map(t => `
+      <tr>
+        <td style="font-family:monospace;font-size:12px">${t.id}</td>
+        <td>${t.label || t.type}</td>
+        <td style="color:${t.amount < 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700">
+          ${t.amount > 0 ? '+' : ''}${t.amount} π
+        </td>
+        <td><span class="badge badge-${t.status === 'success' ? 'success' : t.status === 'fail' ? 'fail' : 'pending'}">${t.status}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${dateStr(t.date)}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">Aucune transaction</td></tr>';
+  } catch (e) { console.error(e); }
+}
+
+async function renderLastTx() {
+  const tb = document.querySelector('#lastTxTable tbody');
+  if (!tb) return;
+  try {
+    const list = await apiGetTransactions();
+    const recent = list.slice(0, 5);
+    tb.innerHTML = recent.length ? recent.map(t => `
+      <tr>
+        <td style="font-family:monospace;font-size:12px">${t.id}</td>
+        <td>${t.label || t.type}</td>
+        <td style="color:${t.amount < 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700">
+          ${t.amount > 0 ? '+' : ''}${t.amount} π
+        </td>
+        <td><span class="badge badge-${t.status === 'success' ? 'success' : t.status === 'fail' ? 'fail' : 'pending'}">${t.status}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${dateStr(t.date)}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Aucune transaction</td></tr>';
+  } catch (e) { console.error(e); }
+}
+
+/* ============================================================
+   BONUS
+   ============================================================ */
+async function doClaimBonus() {
+  const btn = document.getElementById('claimBonusBtn');
+  btn.disabled = true;
+  try {
+    const res = await apiClaimBonus();
+    toast(res.message || 'Bonus crédité !', 'success');
+    refreshUI(); renderTx(); renderLastTx();
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================
+   PROFIL / SIGNALEMENT
+   ============================================================ */
+async function saveProfile() {
+  const nom = document.getElementById('setNom').value.trim();
+  if (!nom) return toast('Le nom est requis', 'error');
+  try {
+    await apiUpdateProfile(nom);
+    toast('Profil mis à jour', 'success');
+    refreshUI();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function sendReport() {
+  const msg = document.getElementById('reportMsg').value.trim();
+  if (!msg) return toast('Écrivez votre message', 'error');
+  try {
+    await apiReport(msg);
+    toast('Signalement envoyé à l\'administrateur', 'success');
+    document.getElementById('reportMsg').value = '';
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   CHART
+   ============================================================ */
+let chartInstance;
+async function renderChart() {
+  const ctx = document.getElementById('chartMain');
+  if (!ctx) return;
+  const u = await apiGetMe();
+  const days = [], vals = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000);
+    days.push(d.toLocaleDateString('fr-FR', { weekday: 'short' }));
+    vals.push((u.investments || [])
+      .filter(x => new Date(x.dueAt).toDateString() === d.toDateString() && x.status === 'paid')
+      .reduce((s, x) => s + x.amount, 0));
+  }
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [{
+        label: 'Revenus (π)',
+        data: vals,
+        borderColor: '#7c3aed',
+        backgroundColor: 'rgba(124,58,237,.1)',
+        fill: true,
+        tension: .35,
+        pointBackgroundColor: '#ec4899',
+        pointRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { color: '#6b7280' } }, x: { ticks: { color: '#6b7280' } } }
+    }
+  });
+}
+
+/* ============================================================
+   FILTRES
+   ============================================================ */
+document.querySelectorAll('[data-ic]').forEach(p => {
+  p.onclick = () => {
+    document.querySelectorAll('[data-ic]').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    renderCampaigns('investList', p.dataset.ic);
+  };
+});
+
+document.querySelectorAll('[data-txf]').forEach(p => {
+  p.onclick = () => {
+    document.querySelectorAll('[data-txf]').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    renderTx(p.dataset.txf);
+  };
+});
+
+/* Checkbox unlock dépôt */
+document.addEventListener('change', e => {
+  if (e.target.id === 'depReadCheck') {
+    document.getElementById('depContinueBtn').disabled = !e.target.checked;
+  }
+});
+
+/* Format numéro retrait */
+document.getElementById('wdNumber').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(async function init() {
+  await refreshUI();
+  renderCampaigns('dashCampaigns', 'all');
+  renderCampaigns('donList', 'all');
+  renderCampaigns('investList', 'all');
+  renderMyInv();
+  renderTx();
+  renderLastTx();
+  renderDonations();
+  setInterval(refreshUI, 60000);
+})();
+</script>
+</body>
+</html>
