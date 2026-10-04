@@ -1,68 +1,410 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CGU & Politique — GPALove_heart</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CGU & Politique de confidentialité — GPALove_heart</title>
 <link rel="icon" href="https://monlogo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+  .legal-hero{
+    padding:60px 0 30px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(124,58,237,.10), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(236,72,153,.10), transparent 50%);
+    text-align:center;
+  }
+  .legal-hero h1{
+    font-size:clamp(28px,4.5vw,42px);
+    font-weight:800;
+    letter-spacing:-0.025em;
+    margin-bottom:14px;
+  }
+  .legal-hero h1 span{
+    background:var(--gradient);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .legal-hero p{
+    color:var(--muted);
+    font-size:15px;
+    margin-bottom:0;
+  }
+  .legal-tabs{
+    display:flex;
+    gap:6px;
+    background:var(--bg-alt);
+    padding:6px;
+    border-radius:14px;
+    max-width:480px;
+    margin:24px auto 0;
+  }
+  .legal-tabs button{
+    flex:1;
+    padding:12px;
+    border:none;
+    background:transparent;
+    border-radius:10px;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+    color:var(--muted);
+    transition:.2s;
+  }
+  .legal-tabs button.active{
+    background:#fff;
+    color:var(--primary);
+    box-shadow:0 4px 12px rgba(124,58,237,.10);
+  }
+  .legal-pane{ display:none; }
+  .legal-pane.active{ display:block; animation:fade .3s; }
+  @keyframes fade{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+  .legal-card{
+    background:#fff;
+    border-radius:var(--radius-lg);
+    padding:38px;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    margin-top:34px;
+  }
+  .legal-card h2{
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:14px;
+    color:var(--primary);
+    letter-spacing:-0.02em;
+  }
+  .legal-card h3{
+    font-size:16.5px;
+    font-weight:700;
+    margin:28px 0 10px;
+    color:var(--text);
+  }
+  .legal-card p, .legal-card li{
+    color:var(--text-soft);
+    font-size:15px;
+    line-height:1.75;
+  }
+  .legal-card ul{
+    padding-left:22px;
+    margin-bottom:14px;
+  }
+  .legal-card ul li{ margin-bottom:6px; }
+  .legal-card .highlight{
+    background:var(--bg-alt);
+    border-left:4px solid var(--primary);
+    padding:14px 18px;
+    border-radius:10px;
+    margin:18px 0;
+    font-size:14.5px;
+    color:var(--text-soft);
+  }
+  .legal-card hr{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:30px 0;
+  }
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    color:var(--primary);
+    font-weight:600;
+    font-size:14.5px;
+    margin-top:24px;
+  }
+  @media(max-width:640px){
+    .legal-card{ padding:24px 20px; }
+  }
+</style>
 </head>
 <body>
+
+<!-- ============================================================
+     HEADER (avec le cœur 💜 comme les autres pages)
+     ============================================================ -->
 <header class="site">
   <div class="container nav">
-    <a href="index.html" class="logo"><img src="https://monlogo.png"> GPALove_heart</a>
-    <nav class="nav-links"><a href="auth.html">Connexion</a></nav>
+    <a href="index.html" class="logo"><span class="heart">💜</span> GPALove_heart</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Accueil</a>
+      <a href="formations.html">Formations</a>
+      <a href="cgu.html" class="active">CGU & Politique</a>
+      <a href="dashboard.html" id="navDash" style="display:none">Mon espace</a>
+      <a href="auth.html" id="navLogin">Connexion</a>
+    </nav>
+    <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')">☰</button>
   </div>
 </header>
 
-<section>
-  <div class="container" style="max-width:840px">
-    <div class="card" style="padding:36px">
-      <h1 style="margin-bottom:8px">Conditions Générales d'Utilisation</h1>
-      <p style="color:var(--muted);margin-bottom:26px">Dernière mise à jour : À compléter</p>
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="legal-hero">
+  <div class="container">
+    <h1>Conditions <span>Générales d'Utilisation</span></h1>
+    <p>Dernière mise à jour : Octobre 2026</p>
 
-      <h3 style="margin-top:24px">1. Objet</h3>
-      <p>Les présentes Conditions Générales d'Utilisation régissent l'accès et l'utilisation de la plateforme. Toute personne utilisant le site reconnaît avoir lu, compris et accepté l'intégralité des présentes conditions avant toute inscription ou utilisation des services.</p>
-
-      <h3 style="margin-top:24px">2. Acceptation obligatoire</h3>
-      <p>Avant toute inscription, l'utilisateur doit cocher la case « Je reconnais avoir lu et accepté les CGU et la Politique de confidentialité », puis cliquer sur Continuer. L'acceptation est enregistrée électroniquement et constitue une preuve juridique.</p>
-
-      <h3 style="margin-top:24px">3. Création de compte</h3>
-      <p>Nom complet · Email valide · Téléphone camerounais (+237) commençant par 6 et contenant 9 chiffres · Mot de passe 6+ caractères, 1 chiffre, 1 caractère spécial. L'email est vérifié par code.</p>
-
-      <h3 style="margin-top:24px">4. Solde utilisateur</h3>
-      <p>Portefeuille virtuel « Solde Principal » permettant dépôts, retraits, dons et investissements. Monnaie interne : la Pièce. <b>1 π = 6 000 XAF</b>.</p>
-
-      <h3 style="margin-top:24px">5. Dépôt</h3>
-      <p>Minimum 0,5 π (3 000 XAF). L'utilisateur doit conserver son identifiant de transaction pour validation.</p>
-
-      <h3 style="margin-top:24px">6. Retraits</h3>
-      <p>Validation manuelle. L'utilisateur fournit opérateur Mobile Money, numéro et montant. Statuts : En attente · Validée · Refusée.</p>
-
-      <h3 style="margin-top:24px">7. Dons</h3>
-      <p>Campagnes publiées par hôpitaux et orphelinats partenaires. Le don est débité immédiatement du solde principal.</p>
-
-      <h3 style="margin-top:24px">8. Investissements</h3>
-      <p>Catégories : Jour · Semaine · Mois · Année. Chaque offre précise ses caractéristiques. L'utilisateur demeure responsable de ses choix.</p>
-
-      <h3 style="margin-top:24px">9. Lutte contre la fraude</h3>
-      <p>Toute tentative de fraude entraîne suspension jusqu'à 24h ou plus, enquête interne et refus de validation.</p>
-
-      <h3 style="margin-top:24px">10. Responsabilité, Disponibilité, Résiliation, Contact</h3>
-      <p>L'utilisateur est seul responsable de la sécurité de son mot de passe. La plateforme peut suspendre un compte frauduleux. Contact : via Paramètres &gt; Signaler un problème.</p>
-
-      <hr style="margin:36px 0;border:none;border-top:1px solid var(--line)">
-
-      <h1 style="margin-bottom:8px">Politique de confidentialité</h1>
-      <h3 style="margin-top:24px">Données collectées</h3>
-      <p>Nom complet, email, téléphone, historique transactions/dons/retraits, statistiques d'utilisation.</p>
-      <h3 style="margin-top:24px">Utilisation</h3>
-      <p>Gérer le compte, sécuriser les paiements, lutter contre la fraude, améliorer les services, répondre aux demandes.</p>
-      <h3 style="margin-top:24px">Sécurité & Droits</h3>
-      <p>Mesures techniques et organisationnelles. Chaque utilisateur peut consulter, corriger ou demander la suppression de ses données.</p>
-
-      <a href="javascript:history.back()" class="btn btn-primary" style="margin-top:30px">← Retour</a>
+    <div class="legal-tabs">
+      <button id="tabCgu" class="active" onclick="switchTab('cgu')">CGU</button>
+      <button id="tabPrivacy" onclick="switchTab('privacy')">Confidentialité</button>
     </div>
   </div>
 </section>
+
+<!-- ============================================================
+     CONTENU
+     ============================================================ -->
+<section style="padding-top:30px;padding-bottom:70px">
+  <div class="container" style="max-width:920px">
+
+    <!-- ============ CGU ============ -->
+    <div class="legal-pane active" id="paneCgu">
+      <div class="legal-card">
+
+        <h2>1. Objet</h2>
+        <p>Les présentes Conditions Générales d'Utilisation (CGU) régissent l'accès et l'utilisation de la plateforme GPALove_heart. Toute personne utilisant le site reconnaît avoir lu, compris et accepté l'intégralité des présentes conditions avant toute inscription ou utilisation des services.</p>
+        <div class="highlight">
+          ⚠️ Aucune utilisation du site n'est autorisée sans acceptation préalable des présentes Conditions Générales.
+        </div>
+
+        <h2>2. Acceptation obligatoire</h2>
+        <p>Avant toute inscription et utilisation de quelque service que ce soit de la plateforme, l'utilisateur doit :</p>
+        <ul>
+          <li>Lire entièrement les présentes conditions.</li>
+          <li>Cocher la case : « Je reconnais avoir lu et accepté les CGU et la Politique de confidentialité. »</li>
+          <li>Cliquer sur Continuer.</li>
+        </ul>
+        <p>L'acceptation est enregistrée électroniquement et constitue une preuve juridique.</p>
+
+        <h2>3. Création d'un compte</h2>
+        <p>Pour créer un compte, l'utilisateur doit fournir :</p>
+        <ul>
+          <li>Nom complet</li>
+          <li>Adresse e-mail valide</li>
+          <li>Numéro de téléphone (+ indicatif international selon le pays)</li>
+          <li>Mot de passe sécurisé</li>
+        </ul>
+        <p>Le numéro de téléphone doit respecter les règles du pays sélectionné (Cameroun, France, Canada, Nigeria, etc.). Le mot de passe doit contenir au minimum 6 caractères, dont un chiffre et un caractère spécial. L'adresse e-mail doit être vérifiée par un code envoyé automatiquement.</p>
+
+        <h2>4. Solde utilisateur</h2>
+        <p>Chaque utilisateur possède un portefeuille virtuel appelé <b>Solde Principal</b>, permettant les dépôts, retraits, dons et investissements proposés sur la plateforme. La monnaie interne utilisée est la <b>Pièce (π)</b>.</p>
+        <div class="highlight">
+          💰 Taux de conversion officiel : <b>1 π = 6 000 XAF</b>
+        </div>
+
+        <h2>5. Dépôts</h2>
+        <p>Le dépôt minimum est fixé à <b>0,5 π (3 000 XAF)</b>. Avant d'être redirigé vers le prestataire de paiement, l'utilisateur est informé :</p>
+        <ul>
+          <li>du montant minimum ;</li>
+          <li>de l'obligation de conserver son identifiant de transaction ;</li>
+          <li>des risques de perte de cet identifiant.</li>
+        </ul>
+        <p>Une fois le paiement effectué, l'utilisateur devra renseigner son identifiant de transaction afin de permettre la vérification. Après validation, son compte est crédité.</p>
+
+        <h2>6. Retraits</h2>
+        <p>Les retraits sont soumis à validation manuelle par l'administration. L'utilisateur doit fournir :</p>
+        <ul>
+          <li>son opérateur Mobile Money (MTN MoMo, Orange Money) ;</li>
+          <li>son numéro ;</li>
+          <li>le montant souhaité.</li>
+        </ul>
+        <p>Toute demande apparaît avec le statut <b>En attente</b>, puis devient <b>Validée</b> ou <b>Refusée</b> après vérification.</p>
+
+        <h2>7. Dons</h2>
+        <p>La plateforme met en relation les utilisateurs avec des hôpitaux ou organisations partenaires (orphelinats) publiant des campagnes. Chaque campagne affiche son objectif, le montant recherché et les modalités prévues. Le don est débité immédiatement du solde principal.</p>
+
+        <h2>8. Investissements</h2>
+        <p>La plateforme peut proposer différentes catégories d'opportunités publiées par des partenaires. Les catégories peuvent être classées par : Jour, Semaine, Mois, Année. Chaque offre précise ses propres caractéristiques. L'utilisateur demeure responsable de ses choix.</p>
+
+        <h2>9. Vérification des partenaires</h2>
+        <p>Toutes les entreprises publiées déclarent avoir accepté les conditions imposées par la plateforme. La plateforme effectue des vérifications raisonnables mais ne garantit jamais le succès économique d'une entreprise.</p>
+
+        <h2>10. Lutte contre la fraude</h2>
+        <p>Toute tentative de fraude, notamment :</p>
+        <ul>
+          <li>faux justificatifs ;</li>
+          <li>usurpation d'identité ;</li>
+          <li>manipulation des transactions ;</li>
+          <li>utilisation abusive de plusieurs comptes ;</li>
+          <li>falsification d'identifiants de paiement ;</li>
+        </ul>
+        <p>entraîne immédiatement :</p>
+        <ul>
+          <li>une suspension temporaire pouvant atteindre <b>24 heures</b> ou davantage selon la gravité ;</li>
+          <li>une enquête interne ;</li>
+          <li>le refus de validation des opérations concernées.</li>
+        </ul>
+        <p>La plateforme se réserve le droit de suspendre définitivement un compte en cas de fraude avérée.</p>
+
+        <h2>11. Responsabilité</h2>
+        <p>L'utilisateur est seul responsable :</p>
+        <ul>
+          <li>des informations fournies ;</li>
+          <li>de la sécurité de son mot de passe ;</li>
+          <li>de l'utilisation de son compte.</li>
+        </ul>
+        <p>La plateforme ne peut être tenue responsable d'une erreur de paiement provenant du prestataire de paiement, d'une erreur de saisie de l'utilisateur, ou d'une interruption indépendante de sa volonté.</p>
+
+        <h2>12. Disponibilité</h2>
+        <p>La plateforme pourra être temporairement indisponible pour maintenance, mises à jour ou amélioration des services.</p>
+
+        <h2>13. Modification des conditions</h2>
+        <p>Les présentes Conditions Générales peuvent être modifiées à tout moment. Les utilisateurs seront informés des changements importants.</p>
+
+        <h2>14. Résiliation</h2>
+        <p>La plateforme peut suspendre ou supprimer un compte en cas de fraude, de comportement abusif ou de violation des présentes conditions.</p>
+
+        <h2>15. Contact</h2>
+        <p>Toute réclamation peut être effectuée depuis la rubrique <b>Paramètres &gt; Signaler un problème</b> dans votre espace personnel.</p>
+
+        <hr>
+        <p style="font-size:13.5px;color:var(--muted);text-align:center">
+          En utilisant GPALove_heart, vous reconnaissez avoir lu et accepté l'intégralité des présentes Conditions Générales d'Utilisation.
+        </p>
+      </div>
+    </div>
+
+    <!-- ============ CONFIDENTIALITÉ ============ -->
+    <div class="legal-pane" id="panePrivacy">
+      <div class="legal-card">
+
+        <h2>Politique de confidentialité</h2>
+        <p>Chez GPALove_heart, nous accordons une importance primordiale à la protection de vos données personnelles. Cette politique explique quelles données nous collectons, pourquoi, et comment nous les protégeons.</p>
+
+        <h3>📋 Données collectées</h3>
+        <p>La plateforme collecte notamment :</p>
+        <ul>
+          <li>nom complet ;</li>
+          <li>adresse e-mail ;</li>
+          <li>numéro de téléphone ;</li>
+          <li>historique des transactions ;</li>
+          <li>historique des dons ;</li>
+          <li>historique des retraits ;</li>
+          <li>statistiques d'utilisation (temps en ligne, pages visitées).</li>
+        </ul>
+
+        <h3>🎯 Utilisation des données</h3>
+        <p>Les données sont utilisées pour :</p>
+        <ul>
+          <li>gérer le compte utilisateur ;</li>
+          <li>sécuriser les paiements ;</li>
+          <li>lutter contre la fraude ;</li>
+          <li>améliorer les services ;</li>
+          <li>répondre aux demandes des utilisateurs.</li>
+        </ul>
+
+        <h3>🕒 Conservation</h3>
+        <p>Les données sont conservées uniquement pendant la durée nécessaire au fonctionnement des services et au respect des obligations légales.</p>
+
+        <h3>🔒 Sécurité</h3>
+        <p>Toutes les informations sont protégées par des mesures de sécurité techniques et organisationnelles destinées à limiter les accès non autorisés. Nous utilisons notamment :</p>
+        <ul>
+          <li>le chiffrement HTTPS pour toutes les communications ;</li>
+          <li>le hachage bcrypt pour les mots de passe (aucun mot de passe n'est stocké en clair) ;</li>
+          <li>des jetons JWT pour les sessions ;</li>
+          <li>une validation systématique des transactions via notre prestataire de paiement.</li>
+        </ul>
+
+        <h3>✅ Vos droits</h3>
+        <p>Chaque utilisateur peut :</p>
+        <ul>
+          <li>consulter ses informations depuis son espace personnel ;</li>
+          <li>demander leur correction ;</li>
+          <li>demander la suppression de son compte, sous réserve des obligations légales de conservation.</li>
+        </ul>
+
+        <h3>🍪 Cookies</h3>
+        <p>Le site peut utiliser des cookies afin :</p>
+        <ul>
+          <li>d'assurer le bon fonctionnement de la plateforme ;</li>
+          <li>d'améliorer l'expérience utilisateur ;</li>
+          <li>de mesurer les performances du site.</li>
+        </ul>
+
+        <h3>📩 Contact</h3>
+        <p>Pour toute question relative à vos données personnelles, contactez-nous à <a href="mailto:info@gpalove-heart.com" style="color:var(--primary);font-weight:600">info@gpalove-heart.com</a>.</p>
+
+        <hr>
+        <div class="highlight">
+          En utilisant la plateforme, l'utilisateur reconnaît avoir lu et accepté la présente Politique de confidentialité ainsi que les Conditions Générales d'Utilisation.
+        </div>
+
+      </div>
+    </div>
+
+    <a href="javascript:history.back()" class="back-link">← Retour</a>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER (avec le cœur 💜)
+     ============================================================ -->
+<footer class="site">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="color:#fff"><span class="heart">💜</span> GPALove_heart</div>
+        <p>Agence internationale de GPA, FIV et don d'ovules. Nous transformons votre rêve de parentalité en réalité.</p>
+      </div>
+      <div>
+        <h5>Plateforme</h5>
+        <a href="index.html">Accueil</a>
+        <a href="formations.html">Formations</a>
+        <a href="cgu.html">CGU</a>
+        <a href="auth.html">Connexion</a>
+      </div>
+      <div>
+        <h5>Légal</h5>
+        <a href="#" onclick="switchTab('cgu');return false">Conditions d'utilisation</a>
+        <a href="#" onclick="switchTab('privacy');return false">Confidentialité</a>
+        <a href="#" onclick="switchTab('privacy');return false">Cookies</a>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <a href="mailto:info@gpalove-heart.com">info@gpalove-heart.com</a>
+        <a href="tel:+237676857155">+237 676 857 155</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2025 GPALove_heart — Tous droits réservés. Fait avec 💜 pour les familles.
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="api.js"></script>
+<script>
+/* Header connecté / visiteur */
+if (getToken()) {
+  document.getElementById('navLogin').style.display = 'none';
+  document.getElementById('navDash').style.display = 'inline-block';
+}
+
+/* Tabs CGU / Confidentialité */
+function switchTab(t) {
+  document.querySelectorAll('.legal-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.legal-tabs button').forEach(b => b.classList.remove('active'));
+  if (t === 'privacy') {
+    document.getElementById('panePrivacy').classList.add('active');
+    document.getElementById('tabPrivacy').classList.add('active');
+  } else {
+    document.getElementById('paneCgu').classList.add('active');
+    document.getElementById('tabCgu').classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* Support du hash #privacy */
+if (location.hash === '#privacy') switchTab('privacy');
+</script>
 </body>
 </html>
