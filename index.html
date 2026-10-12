@@ -467,7 +467,7 @@
      ============================================================ -->
 <script src="api.js"></script>
 <script>
-/* ===== Header : connexion / dashboard ===== */
+/* ===== Header connexion / dashboard ===== */
 if (getToken()) {
   document.getElementById('btnLogin').style.display = 'none';
   document.getElementById('btnDash').style.display = 'inline-flex';
@@ -475,9 +475,7 @@ if (getToken()) {
 
 /* ===== FAQ accordéon ===== */
 function toggleFaq(el) {
-  document.querySelectorAll('.faq-item').forEach(f => {
-    if (f !== el) f.classList.remove('open');
-  });
+  document.querySelectorAll('.faq-item').forEach(f => { if (f !== el) f.classList.remove('open'); });
   el.classList.toggle('open');
 }
 
@@ -487,9 +485,9 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-/* ===== Preview mères porteuses ===== */
-async function loadSurrogates() {
-/* Images des mères porteuses */
+/* ============================================================
+   IMAGES DES MÈRES PORTEUSES
+   ============================================================ */
 const SURROGATE_IMAGES = [
   'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80',
   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80',
@@ -512,8 +510,12 @@ function getSurrogateImage(id) {
   return SURROGATE_IMAGES[Math.abs(hash) % SURROGATE_IMAGES.length];
 }
 
+/* ============================================================
+   PREVIEW MÈRES PORTEUSES
+   ============================================================ */
 async function loadSurrogates() {
   const box = document.getElementById('surrogatesPreview');
+  if (!box) return;
   try {
     const list = await apiGetSurrogates();
     const preview = list.slice(0, 6);
@@ -532,29 +534,17 @@ async function loadSurrogates() {
       </div>
     `).join('');
   } catch (e) {
-    box.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">Chargement impossible. Réessayez dans quelques instants.</p>';
-  }
-}
-</div>
-        <div class="body">
-          <h4>${s.name} ${s.verified ? '<span style="color:var(--success);font-size:13px">✔️</span>' : ''}</h4>
-          <div class="meta">${s.age} ans · ${s.city}, ${s.country}</div>
-          <div class="meta">🌍 ${s.continent} · ${(s.languages || []).join(', ')}</div>
-          <div class="meta" style="color:var(--primary);font-weight:600">Choisie ${s.chosenCount || 0} fois</div>
-          <div class="actions">
-            <a href="auth.html#signup" class="btn btn-primary btn-sm" style="flex:1">Voir le profil →</a>
-          </div>
-        </div>
-      </div>
-    `).join('');
-  } catch (e) {
+    console.error(e);
     box.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">Chargement impossible. Réessayez dans quelques instants.</p>';
   }
 }
 
-/* ===== Preview campagnes ===== */
+/* ============================================================
+   PREVIEW CAMPAGNES
+   ============================================================ */
 async function loadCampaigns() {
   const box = document.getElementById('campaignsPreview');
+  if (!box) return;
   try {
     const list = await apiGetCampaigns();
     const preview = list.slice(0, 3);
@@ -562,7 +552,7 @@ async function loadCampaigns() {
       <div class="card" style="background:#fff;color:var(--text)">
         <div style="font-size:36px;margin-bottom:8px">🏥</div>
         <h3 style="color:var(--text)">${c.company}</h3>
-        <p style="color:var(--muted)">${c.description.slice(0, 120)}...</p>
+        <p style="color:var(--muted)">${(c.description || '').slice(0, 120)}...</p>
         <div style="display:flex;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
           <div><b style="color:var(--primary)">${c.amountAsked} π</b><div style="font-size:12px;color:var(--muted)">à donner</div></div>
           <div style="text-align:right"><b style="color:var(--secondary)">${c.returnAmount} π</b><div style="font-size:12px;color:var(--muted)">à recevoir</div></div>
@@ -571,13 +561,17 @@ async function loadCampaigns() {
       </div>
     `).join('');
   } catch (e) {
+    console.error(e);
     box.innerHTML = '<p style="color:#fff;text-align:center;grid-column:1/-1">Chargement impossible.</p>';
   }
 }
 
-/* ===== Preview témoignages ===== */
+/* ============================================================
+   PREVIEW TÉMOIGNAGES
+   ============================================================ */
 async function loadTestimonials() {
   const box = document.getElementById('testimonialsPreview');
+  if (!box) return;
   try {
     const list = await apiGetTestimonials(6);
     box.innerHTML = list.map(t => `
@@ -585,19 +579,23 @@ async function loadTestimonials() {
         <div class="stars">${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}</div>
         <p>"${t.msg}"</p>
         <div class="author">
-          <div class="avatar">${t.name.charAt(0)}</div>
+          <div class="avatar">${(t.name || '?').charAt(0)}</div>
           <div><b>${t.name}</b><span>${t.city}, ${t.country}</span></div>
         </div>
       </div>
     `).join('');
   } catch (e) {
+    console.error(e);
     box.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">Chargement impossible.</p>';
   }
 }
 
-/* ===== Preview formations ===== */
+/* ============================================================
+   PREVIEW FORMATIONS
+   ============================================================ */
 async function loadFormations() {
   const box = document.getElementById('formationsPreview');
+  if (!box) return;
   try {
     const data = await apiGetFormations('', 3);
     const list = data.list || [];
@@ -610,25 +608,30 @@ async function loadFormations() {
       </div>
     `).join('');
   } catch (e) {
+    console.error(e);
     box.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">Chargement impossible.</p>';
   }
 }
 
-/* ===== Contact form ===== */
-async function submitContact(e) {
+/* ============================================================
+   FORMULAIRES
+   ============================================================ */
+function submitContact(e) {
   e.preventDefault();
   const first = document.getElementById('cFirst').value;
-  const last = document.getElementById('cLast').value;
-  const email = document.getElementById('cEmail').value;
-  const phone = document.getElementById('cPhone').value;
-  const country = document.getElementById('cCountry').value;
-  const message = document.getElementById('cMessage').value;
   toast('Merci ' + first + ' ! Votre message a bien été envoyé. Nous vous répondrons sous 24h.', 'success');
   e.target.reset();
-  // Ici tu pourras plus tard faire un appel à une route /contact du backend
 }
 
-/* ===== Smooth scroll avec offset header ===== */
+function submitNewsletter(e) {
+  e.preventDefault();
+  toast('Merci ! Votre inscription à la newsletter est confirmée.', 'success');
+  e.target.reset();
+}
+
+/* ============================================================
+   SMOOTH SCROLL
+   ============================================================ */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', (e) => {
     const id = a.getAttribute('href');
@@ -636,12 +639,15 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
       e.preventDefault();
       const top = document.querySelector(id).getBoundingClientRect().top + window.scrollY - 90;
       window.scrollTo({ top, behavior: 'smooth' });
-      document.getElementById('navLinks').classList.remove('mobile-open');
+      const nav = document.getElementById('navLinks');
+      if (nav) nav.classList.remove('mobile-open');
     }
   });
 });
 
-/* ===== Init ===== */
+/* ============================================================
+   INIT
+   ============================================================ */
 loadSurrogates();
 loadCampaigns();
 loadTestimonials();
