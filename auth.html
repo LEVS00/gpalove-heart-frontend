@@ -322,10 +322,17 @@ document.getElementById('regTel').addEventListener('input', (e) => {
   e.target.value = e.target.value.replace(/\D/g, '');
 });
 
+/* Si déjà connecté : rediriger selon le paramètre 'redirect' ou vers le dashboard */
 if (getToken()) {
   const u = getCachedUser();
-  if (u?.isAdmin) location.href = 'admin.html';
-  else location.href = 'dashboard.html';
+  const redirectTo = params.get('redirect');
+  if (u?.isAdmin) {
+    location.href = 'admin.html';
+  } else if (redirectTo) {
+    location.href = redirectTo;
+  } else {
+    location.href = 'dashboard.html';
+  }
 }
 </script>
 </body>
