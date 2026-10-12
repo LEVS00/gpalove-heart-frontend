@@ -489,13 +489,53 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 /* ===== Preview mères porteuses ===== */
 async function loadSurrogates() {
+/* Images des mères porteuses */
+const SURROGATE_IMAGES = [
+  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80',
+  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80',
+  'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=600&q=80',
+  'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=600&q=80',
+  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80',
+  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&q=80',
+  'https://images.unsplash.com/photo-1554151228-14d9def656e4?w=600&q=80',
+  'https://images.unsplash.com/photo-1499651681375-8afc5a4db253?w=600&q=80',
+  'https://images.unsplash.com/photo-1546961329-78bef0414d7c?w=600&q=80',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80',
+  'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=600&q=80'
+];
+
+function getSurrogateImage(id) {
+  if (!id) return SURROGATE_IMAGES[0];
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffffffff;
+  return SURROGATE_IMAGES[Math.abs(hash) % SURROGATE_IMAGES.length];
+}
+
+async function loadSurrogates() {
   const box = document.getElementById('surrogatesPreview');
   try {
     const list = await apiGetSurrogates();
     const preview = list.slice(0, 6);
     box.innerHTML = preview.map(s => `
       <div class="profile-card">
-        <div class="ph">${s.photo || '👩🏾'}</div>
+        <div class="ph" style="background-image:url('${getSurrogateImage(s.id)}');background-size:cover;background-position:center;font-size:0;color:transparent"></div>
+        <div class="body">
+          <h4>${s.name} ${s.verified ? '<span style="color:var(--success);font-size:13px">✔️</span>' : ''}</h4>
+          <div class="meta">${s.age} ans · ${s.city}, ${s.country}</div>
+          <div class="meta">🌍 ${s.continent || ''} · ${(s.languages || []).join(', ')}</div>
+          <div class="meta" style="color:var(--primary);font-weight:600">Choisie ${s.chosenCount || 0} fois</div>
+          <div class="actions">
+            <a href="mere.html?id=${s.id}" class="btn btn-primary btn-sm" style="flex:1">Voir le profil →</a>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    box.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1">Chargement impossible. Réessayez dans quelques instants.</p>';
+  }
+}
+</div>
         <div class="body">
           <h4>${s.name} ${s.verified ? '<span style="color:var(--success);font-size:13px">✔️</span>' : ''}</h4>
           <div class="meta">${s.age} ans · ${s.city}, ${s.country}</div>
