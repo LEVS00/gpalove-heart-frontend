@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profil Mère Porteuse — GPALove_heart</title>
+<meta name="description" content="Consultez le dossier médical et financier d'une mère porteuse vérifiée. Copiez le lien et envoyez-le à votre agent WhatsApp.">
+<link rel="icon" href="https://monlogo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ====== PROFIL HERO ====== */
+  .profile-hero{
+    position: relative;
+    background: #1a1a2e;
+    overflow: hidden;
+    padding: 0;
+  }
+  .profile-backdrop{
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.28;
+  }
+  .profile-overlay{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(124,58,237,.88) 0%, rgba(236,72,153,.82) 100%);
+  }
+  .profile-hero .container{
+    position: relative;
+    z-index: 2;
+    padding: 70px 20px 60px;
+  }
+  .profile-avatar-lg{
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    border: 5px solid rgba(255,255,255,.35);
+    box-shadow: 0 20px 50px rgba(0,0,0,.30);
+    margin: 0 auto 22px;
+  }
+  .profile-name{
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .profile-sub{
+    text-align: center;
+    color: rgba(255,255,255,.92);
+    font-size: 15.5px;
+    margin-bottom: 24px;
+  }
+  .profile-badges{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 26px;
+  }
+  .profile-badge{
+    padding: 6px 14px;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 30px;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Compteur de choix */
+  .chosen-count{
+    background: rgba(255,255,255,.15);
+    border: 2px solid rgba(255,255,255,.35);
+    border-radius: 16px;
+    padding: 18px 24px;
+    text-align: center;
+    max-width: 300px;
+    margin: 0 auto 24px;
+    backdrop-filter: blur(10px);
+  }
+  .chosen-count .num{
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .chosen-count .lbl{
+    font-size: 12.5px;
+    color: rgba(255,255,255,.85);
+    font-weight: 500;
+  }
+
+  /* Boutons d'action */
+  .profile-actions{
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  /* ====== INFOS DÉTAILLÉES ====== */
+  .info-section{
+    padding: 50px 0 30px;
+  }
+  .info-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  @media(max-width: 720px){
+    .info-grid{ grid-template-columns: 1fr; }
+  }
+
+  .info-card{
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px;
+    box-shadow: var(--shadow-sm);
+  }
+  .info-card h3{
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary);
+  }
+  .info-card h3 .ico{
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--gradient-soft);
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+  }
+
+  .info-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14.5px;
+  }
+  .info-row:last-child{ border-bottom: none; }
+  .info-row .label{
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .info-row .value{
+    color: var(--text);
+    font-weight: 600;
+    text-align: right;
+  }
+  .info-row .value.green{ color: var(--success); }
+  .info-row .value.orange{ color: var(--warn); }
+  .info-row .value.purple{ color: var(--primary); }
+
+  .tag-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .tag{
+    padding: 5px 12px;
+    background: var(--bg-alt);
+    color: var(--primary);
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  /* ====== AVERTISSEMENT ====== */
+  .warning-box{
+    background: #fff7e6;
+    border-left: 4px solid var(--warn);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 30px auto;
+    max-width: 760px;
+    font-size: 14.5px;
+    color: #92400e;
+    line-height: 1.7;
+  }
+  .warning-box b{ color: #b45309; }
+
+  /* ====== CTA ====== */
+  .profile-cta{
+    background: var(--gradient-soft);
+    border-radius: var(--radius-lg);
+    padding: 44px 30px;
+    text-align: center;
+    max-width: 760px;
+    margin: 40px auto;
+  }
+  .profile-cta h2{
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  .profile-cta p{
+    color: var(--text-soft);
+    font-size: 15px;
+    margin-bottom: 22px;
+  }
+
+  /* ====== EMPTY / LOADER ====== */
+  .empty-profile{
+    text-align: center;
+    padding: 90px 20px;
+  }
+  .empty-profile .icon{ font-size: 80px; margin-bottom: 20px; opacity: .4; }
+  .empty-profile h2{ font-size: 24px; margin-bottom: 10px; }
+  .empty-profile p{ color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site">
+  <div class="container nav">
+    <a href="index.html" class="logo"><span class="heart">💜</span> GPALove_heart</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">Accueil</a>
+      <a href="index.html#meres">Mères porteuses</a>
+      <a href="formations.html">Formations</a>
+      <a href="cgu.html">CGU</a>
+      <a href="dashboard.html" id="navDash" style="display:none">Mon espace</a>
+      <a href="auth.html" id="navLogin">Connexion</a>
+    </nav>
+    <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')">☰</button>
+  </div>
+</header>
+
+<!-- ============================================================
+     CONTENU DYNAMIQUE
+     ============================================================ -->
+<div id="profileRoot">
+  <div class="loader" style="margin: 80px auto"></div>
+</div>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="color:#fff"><span class="heart">💜</span> GPALove_heart</div>
+        <p>Agence internationale de GPA, FIV et don d'ovules. Nous transformons votre rêve de parentalité en réalité.</p>
+      </div>
+      <div>
+        <h5>Plateforme</h5>
+        <a href="index.html">Accueil</a>
+        <a href="index.html#meres">Mères porteuses</a>
+        <a href="formations.html">Formations</a>
+        <a href="cgu.html">CGU</a>
+      </div>
+      <div>
+        <h5>Mon compte</h5>
+        <a href="auth.html">Connexion</a>
+        <a href="auth.html#signup">Inscription</a>
+        <a href="dashboard.html">Tableau de bord</a>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <a href="mailto:info@gpalove-heart.com">info@gpalove-heart.com</a>
+        <a href="tel:+237676857155">+237 676 857 155</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2025 GPALove_heart — Tous droits réservés. Fait avec 💜 pour les familles.
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="api.js"></script>
+<script>
+/* ===== Header connecté / visiteur ===== */
+if (getToken()) {
+  document.getElementById('navLogin').style.display = 'none';
+  document.getElementById('navDash').style.display = 'inline-block';
+}
+
+/* ============================================================
+   IMAGES DES MÈRES PORTEUSES (Unsplash direct)
+   ============================================================ */
+const SURROGATE_IMAGES = [
+  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80',
+  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&q=80',
+  'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800&q=80',
+  'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&q=80',
+  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80',
+  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&q=80',
+  'https://images.unsplash.com/photo-1554151228-14d9def656e4?w=800&q=80',
+  'https://images.unsplash.com/photo-1499651681375-8afc5a4db253?w=800&q=80',
+  'https://images.unsplash.com/photo-1546961329-78bef0414d7c?w=800&q=80',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80',
+  'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&q=80'
+];
+
+/* Associer une image à chaque profil de manière stable (par index) */
+function getSurrogateImage(id) {
+  if (!id) return SURROGATE_IMAGES[0];
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) & 0xffffffff;
+  }
+  return SURROGATE_IMAGES[Math.abs(hash) % SURROGATE_IMAGES.length];
+}
+
+/* ============================================================
+   RÉCUPÉRATION DU PROFIL
+   ============================================================ */
+const params = new URLSearchParams(location.search);
+const surrogateId = params.get('id');
+
+async function loadProfile() {
+  const root = document.getElementById('profileRoot');
+
+  if (!surrogateId) {
+    root.innerHTML = `
+      <div class="container">
+        <div class="empty-profile">
+          <div class="icon">🔍</div>
+          <h2>Aucun profil sélectionné</h2>
+          <p>Le lien que vous avez utilisé ne contient pas d'identifiant de dossier.</p>
+          <a href="index.html#meres" class="btn btn-primary">Voir tous les profils →</a>
+        </div>
+      </div>`;
+    return;
+  }
+
+  try {
+    const s = await apiGetSurrogate(surrogateId);
+    renderProfile(s);
+  } catch (e) {
+    root.innerHTML = `
+      <div class="container">
+        <div class="empty-profile">
+          <div class="icon">❌</div>
+          <h2>Profil introuvable</h2>
+          <p>Ce dossier n'existe pas ou a été retiré de la plateforme.</p>
+          <a href="index.html#meres" class="btn btn-primary">Retour aux profils →</a>
+        </div>
+      </div>`;
+  }
+}
+
+/* ============================================================
+   AFFICHAGE DU PROFIL
+   ============================================================ */
+function renderProfile(s) {
+  const img = getSurrogateImage(s.id);
+  const root = document.getElementById('profileRoot');
+
+  const languages = Array.isArray(s.languages) ? s.languages : [];
+  const interests = s.interests ? [s.interests] : [];
+
+  root.innerHTML = `
+    <!-- HERO -->
+    <section class="profile-hero">
+      <div class="profile-backdrop" style="background-image:url('${img}')"></div>
+      <div class="profile-overlay"></div>
+
+      <div class="container">
+        <div class="profile-avatar-lg" style="background-image:url('${img}')"></div>
+
+        <h1 class="profile-name">${s.name || 'Mère porteuse'}</h1>
+        <p class="profile-sub">
+          ${s.age ? s.age + ' ans' : ''} · ${s.city || ''}${s.country ? ', ' + s.country : ''}
+          ${s.continent ? ' · ' + s.continent : ''}
+        </p>
+
+        <div class="profile-badges">
+          ${s.verified ? '<span class="profile-badge">✅ Profil vérifié</span>' : '<span class="profile-badge">⏳ Vérification en cours</span>'}
+          ${s.blood ? `<span class="profile-badge">🩸 Groupe ${s.blood}</span>` : ''}
+          ${s.availableInternationally ? '<span class="profile-badge">🌍 Disponible à l\'international</span>' : ''}
+        </div>
+
+        <div class="chosen-count">
+          <div class="num">${s.chosenCount || 0}</div>
+          <div class="lbl">fois choisie par d'autres parents</div>
+        </div>
+
+        <div class="profile-actions">
+          <button class="btn btn-lg" style="background:#fff;color:#7c3aed;font-weight:700" onclick="copyLink('${s.id}')">
+            📋 Copier le lien pour mon agent
+          </button>
+          <a href="https://wa.me/237676857155?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20le%20dossier%20${s.id}"
+             target="_blank"
+             class="btn btn-lg"
+             style="background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.4)">
+            💬 Contacter un agent
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- INFOS DÉTAILLÉES -->
+    <section class="info-section">
+      <div class="container" style="max-width:960px">
+        <div class="info-grid">
+
+          <!-- Médical -->
+          <div class="info-card">
+            <h3><span class="ico">🩺</span> Dossier médical</h3>
+
+            <div class="info-row">
+              <span class="label">État de santé général</span>
+              <span class="value green">${s.health || 'Non renseigné'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Groupe sanguin</span>
+              <span class="value purple">${s.blood || '—'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">IMC</span>
+              <span class="value">${s.bmi || s.imc || '—'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Taille</span>
+              <span class="value">${s.height ? s.height + ' cm' : '—'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Poids</span>
+              <span class="value">${s.weight ? s.weight + ' kg' : '—'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Grossesses antérieures</span>
+              <span class="value">${s.pregnancies != null ? s.pregnancies : '—'}</span>
+            </div>
+          </div>
+
+          <!-- Financier & personnel -->
+          <div class="info-card">
+            <h3><span class="ico">💼</span> Situation & profil</h3>
+
+            <div class="info-row">
+              <span class="label">Situation financière</span>
+              <span class="value orange">${s.financial || 'Non renseigné'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Niveau d'éducation</span>
+              <span class="value">${s.education || '—'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Nationalité</span>
+              <span class="value">${s.nationality || s.country || '—'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Disponibilité internationale</span>
+              <span class="value ${s.availableInternationally ? 'green' : ''}">
+                ${s.availableInternationally ? 'Oui' : 'Non'}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="label">Langues parlées</span>
+              <span class="value">${languages.length ? languages.join(', ') : '—'}</span>
+            </div>
+            ${interests.length ? `
+            <div class="info-row" style="display:block">
+              <span class="label" style="display:block;margin-bottom:10px">Centres d'intérêt</span>
+              <div class="tag-list">
+                ${interests.map(i => `<span class="tag">${i}</span>`).join('')}
+              </div>
+            </div>` : ''}
+          </div>
+
+        </div>
+
+        <!-- Avertissement confidentialité -->
+        <div class="warning-box">
+          <b>🔒 Confidentialité garantie</b><br>
+          Pour des raisons de sécurité et de confidentialité, les coordonnées directes de la mère porteuse ne sont jamais communiquées.
+          <b>Copiez le lien de ce profil</b> et envoyez-le à votre agent WhatsApp pour qu'il consulte le dossier complet et organise la mise en relation.
+        </div>
+
+        <!-- CTA -->
+        <div class="profile-cta">
+          <h2>Ce profil vous intéresse ?</h2>
+          <p>Créez votre compte gratuit pour accéder à tous les profils et contacter un agent.</p>
+          <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+            <a href="auth.html#signup" class="btn btn-primary btn-lg">Créer mon compte →</a>
+            <button class="btn btn-ghost btn-lg" onclick="copyLink('${s.id}')">📋 Copier le lien</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  `;
+}
+
+/* ============================================================
+   COPIER LE LIEN POUR L'AGENT
+   ============================================================ */
+async function copyLink(id) {
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+  const url = base + 'mere.html?id=' + id;
+  try {
+    await navigator.clipboard.writeText(url);
+    try { await apiIncrementChosen(id); } catch {}
+    toast('✅ Lien copié ! Envoyez-le à votre agent WhatsApp.', 'success');
+  } catch {
+    toast('Copie impossible. Copiez manuellement : ' + url, 'error');
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+loadProfile();
+</script>
+</body>
+</html>
