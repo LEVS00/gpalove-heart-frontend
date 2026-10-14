@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — GPALove_heart</title>
+<link rel="icon" href="https://monlogo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .admin-badge{display:inline-block;padding:4px 12px;background:var(--gradient);color:#fff;
+    border-radius:20px;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+  .stat-mini-admin{font-size:28px;font-weight:900;background:var(--gradient);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+  .pending-badge{display:inline-block;min-width:22px;height:22px;padding:0 8px;
+    background:var(--danger);color:#fff;border-radius:20px;font-size:11px;font-weight:800;
+    text-align:center;line-height:22px;margin-left:6px}
+  .action-cell{display:flex;gap:6px;flex-wrap:wrap}
+  @media(max-width:640px){
+    .hide-mobile{display:none}
+    table{font-size:13px}
+    th,td{padding:10px 6px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER ADMIN
+     ============================================================ -->
+<header class="site">
+  <div class="container nav">
+    <a href="admin.html" class="logo"><span class="heart">💜</span> GPALove_heart</a>
+    <span class="admin-badge hide-mobile">Admin</span>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span style="font-size:13px;color:var(--muted)" class="hide-mobile" id="adminName">—</span>
+      <button class="btn btn-ghost btn-sm" onclick="apiLogout()">Déconnexion</button>
+      <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="container dash">
+
+  <!-- ============ SIDEBAR ADMIN ============ -->
+  <aside class="sidebar" id="navLinks">
+    <div class="item active" data-tab="dash">📊 Dashboard</div>
+    <div class="item" data-tab="deposits">💰 Dépôts <span id="badgeDep" class="pending-badge" style="display:none">0</span></div>
+    <div class="item" data-tab="withdrawals">💸 Retraits <span id="badgeWd" class="pending-badge" style="display:none">0</span></div>
+    <div class="item" data-tab="users">👥 Utilisateurs</div>
+    <div class="item" data-tab="campaigns">📢 Campagnes</div>
+    <div class="item" data-tab="surrogates">👶 Mères porteuses</div>
+    <div class="item" data-tab="notifs">🔔 Notifications</div>
+    <div class="item" data-tab="gifts">🎁 Cadeaux</div>
+  </aside>
+
+  <main>
+
+    <!-- ============ DASHBOARD ============ -->
+    <div class="tab-content active" id="tab-dash">
+      <h2 style="margin-bottom:24px">📊 Vue globale</h2>
+      <div class="grid grid-4" style="margin-bottom:26px">
+        <div class="card">
+          <h3>Utilisateurs</h3>
+          <div class="stat-mini-admin" id="aUsers">0</div>
+        </div>
+        <div class="card">
+          <h3>Budget total</h3>
+          <div class="stat-mini-admin" id="aBudget">0 π</div>
+        </div>
+        <div class="card">
+          <h3>Dépôts en attente</h3>
+          <div class="stat-mini-admin" id="aDep">0</div>
+        </div>
+        <div class="card">
+          <h3>Retraits en attente</h3>
+          <div class="stat-mini-admin" id="aWd">0</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:14px">Dépôts validés (7 derniers jours)</h3>
+        <canvas id="adminChart" height="90"></canvas>
+      </div>
+    </div>
+
+    <!-- ============ DÉPÔTS ============ -->
+    <div class="tab-content" id="tab-deposits">
+      <h2 style="margin-bottom:20px">💰 Demandes de dépôt en attente</h2>
+      <p style="color:var(--muted);margin-bottom:20px;font-size:14.5px">
+        Vérifiez le TxID puis validez pour créditer le compte de l'utilisateur.
+      </p>
+      <div class="card" style="overflow-x:auto">
+        <table id="tblDep">
+          <thead>
+            <tr><th>ID</th><th>Utilisateur</th><th>Montant</th><th>TxID</th><th>Date</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ RETRAITS ============ -->
+    <div class="tab-content" id="tab-withdrawals">
+      <h2 style="margin-bottom:20px">💸 Demandes de retrait en attente</h2>
+      <p style="color:var(--muted);margin-bottom:20px;font-size:14.5px">
+        Effectuez le virement Mobile Money puis validez pour confirmer.
+      </p>
+      <div class="card" style="overflow-x:auto">
+        <table id="tblWd">
+          <thead>
+            <tr><th>ID</th><th>Utilisateur</th><th>Opérateur</th><th>Numéro</th><th>Montant</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ UTILISATEURS ============ -->
+    <div class="tab-content" id="tab-users">
+      <h2 style="margin-bottom:20px">👥 Utilisateurs</h2>
+      <div class="card" style="overflow-x:auto">
+        <table id="tblUsers">
+          <thead>
+            <tr><th>Nom</th><th class="hide-mobile">Email</th><th class="hide-mobile">Tél</th><th>Solde</th><th>Statut</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ CAMPAGNES ============ -->
+    <div class="tab-content" id="tab-campaigns">
+      <h2 style="margin-bottom:20px">📢 Publier une campagne</h2>
+      <div class="card" style="margin-bottom:24px">
+        <div class="grid grid-2">
+          <div class="field"><label>Nom entreprise/hôpital *</label><input id="cpName" placeholder="Ex: Clinique de l'Espoir Kribi"></div>
+          <div class="field"><label>Localisation</label><input id="cpLocation" placeholder="Ex: Kribi, Cameroun"></div>
+        </div>
+        <div class="field"><label>Photos (URLs, min 2, séparées par virgule)</label>
+          <input id="cpPhotos" placeholder="https://img1.jpg,https://img2.jpg">
+        </div>
+        <div class="grid grid-3">
+          <div class="field"><label>Montant demandé (π) *</label><input id="cpAsk" type="number" step="0.1" placeholder="10"></div>
+          <div class="field"><label>Montant à rendre (π) *</label><input id="cpRet" type="number" step="0.1" placeholder="30"></div>
+          <div class="field"><label>Catégorie *</label>
+            <select id="cpCat">
+              <option value="jour">Jour</option>
+              <option value="semaine">Semaine</option>
+              <option value="mois">Mois</option>
+              <option value="année">Année</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-3">
+          <div class="field"><label>Durée (jours)</label><input id="cpDur" type="number" value="30"></div>
+          <div class="field"><label>Email de contact</label><input id="cpEmail" type="email" placeholder="contact@hopital.com"></div>
+          <div class="field"><label>Téléphone de contact</label><input id="cpPhone" placeholder="+237..."></div>
+        </div>
+        <div class="field"><label>Description *</label><textarea id="cpDesc" rows="3" placeholder="Décrivez la campagne..."></textarea></div>
+        <button class="btn btn-primary" onclick="publishCampaign()">📢 Publier la campagne</button>
+      </div>
+
+      <h3 style="margin-bottom:14px">Campagnes actives</h3>
+      <div class="grid grid-3" id="adminCamps"></div>
+    </div>
+
+    <!-- ============ MÈRES PORTEUSES ============ -->
+    <div class="tab-content" id="tab-surrogates">
+      <h2 style="margin-bottom:20px">👶 Mères porteuses</h2>
+
+      <div class="card" style="margin-bottom:24px">
+        <h3 style="margin-bottom:12px">🤖 Import par IA</h3>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:14px">
+          Collez le texte brut d'un profil (bio, médical, financier). L'IA le structurera automatiquement.
+        </p>
+        <div class="field"><textarea id="aiRawText" rows="6" placeholder="Collez ici le texte brut du profil..."></textarea></div>
+        <button class="btn btn-primary" onclick="importViaAI()">🤖 Analyser avec l'IA</button>
+      </div>
+
+      <div class="card" style="overflow-x:auto">
+        <table id="tblSur">
+          <thead>
+            <tr><th>ID</th><th>Nom</th><th>Pays</th><th>Statut</th><th>Choisie</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ NOTIFICATIONS ============ -->
+    <div class="tab-content" id="tab-notifs">
+      <h2 style="margin-bottom:20px">🔔 Notifications & Signalements</h2>
+      <div class="card" style="margin-bottom:24px">
+        <h3 style="margin-bottom:14px">📤 Envoyer une notification</h3>
+        <div class="field"><label>Destinataire (email ou "ALL")</label><input id="notifTo" value="ALL" placeholder="ALL"></div>
+        <div class="field"><label>Message</label><textarea id="notifMsg" rows="3" placeholder="Votre message..."></textarea></div>
+        <button class="btn btn-primary" onclick="sendNotif()">📤 Envoyer</button>
+      </div>
+      <h3 style="margin-bottom:14px">Signalements récents</h3>
+      <div class="card" id="notifList"></div>
+    </div>
+
+    <!-- ============ CADEAUX ============ -->
+    <div class="tab-content" id="tab-gifts">
+      <h2 style="margin-bottom:20px">🎁 Envoyer un cadeau</h2>
+      <div class="card" style="max-width:520px">
+        <div class="field"><label>Email de l'utilisateur</label><input id="giftTo" type="email" placeholder="utilisateur@exemple.com"></div>
+        <div class="field"><label>Montant du cadeau (π)</label><input id="giftAmt" type="number" step="0.1" placeholder="1.0"></div>
+        <button class="btn btn-success" onclick="sendGift()">🎁 Envoyer le cadeau</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="api.js"></script>
+<script>
+/* ===== Guard admin ===== */
+const admin = requireAdmin();
+if (!admin) throw new Error('Not admin');
+document.getElementById('adminName').textContent = admin.nom || admin.email;
+
+/* ===== Tabs ===== */
+document.querySelectorAll('.sidebar .item').forEach(it => {
+  it.onclick = () => {
+    document.querySelectorAll('.sidebar .item').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+    it.classList.add('active');
+    document.getElementById('tab-' + it.dataset.tab).classList.add('active');
+    if (it.dataset.tab === 'dash') drawChart();
+  };
+});
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+async function renderDash() {
+  try {
+    const stats = await admin.getStats();
+    document.getElementById('aUsers').textContent = stats.totalUsers || 0;
+    document.getElementById('aBudget').textContent = fmtPi(stats.totalBalance || 0);
+    document.getElementById('aDep').textContent = stats.pendingDeposits || 0;
+    document.getElementById('aWd').textContent = stats.pendingWithdrawals || 0;
+
+    // Badges sidebar
+    const bD = document.getElementById('badgeDep');
+    const bW = document.getElementById('badgeWd');
+    if (stats.pendingDeposits > 0) { bD.textContent = stats.pendingDeposits; bD.style.display = 'inline-block'; }
+    else bD.style.display = 'none';
+    if (stats.pendingWithdrawals > 0) { bW.textContent = stats.pendingWithdrawals; bW.style.display = 'inline-block'; }
+    else bW.style.display = 'none';
+  } catch (e) { console.error(e); }
+}
+
+/* ============================================================
+   DÉPÔTS
+   ============================================================ */
+async function renderDeposits() {
+  const tb = document.querySelector('#tblDep tbody');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px"><div class="loader"></div></td></tr>';
+  try {
+    const list = await admin.getDeposits();
+    const pending = list.filter(d => d.status === 'pending');
+    if (!pending.length) {
+      tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Aucun dépôt en attente ✅</td></tr>';
+      return;
+    }
+    tb.innerHTML = pending.map(d => `
+      <tr>
+        <td style="font-family:monospace;font-size:12px">${d.id}</td>
+        <td>
+          <div style="font-weight:600">${d.userId?.nom || '?'}</div>
+          <div style="font-size:12px;color:var(--muted)">${d.userId?.email || ''}</div>
+        </td>
+        <td style="font-weight:800;color:var(--primary)">${fmtPi(d.amount)}</td>
+        <td style="font-family:monospace;font-size:12px">${d.txId || '—'}</td>
+        <td style="font-size:12px;color:var(--muted)">${dateStr(d.date)}</td>
+        <td>
+          <div class="action-cell">
+            <button class="btn btn-success btn-sm" onclick="approveDeposit('${d.id}')">✅ Valider</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectDeposit('${d.id}')">❌ Refuser</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:24px">Erreur de chargement</td></tr>';
+  }
+}
+
+async function approveDeposit(id) {
+  if (!confirm('Valider ce dépôt ? Le compte sera crédité immédiatement.')) return;
+  try {
+    await admin.approveDeposit(id);
+    toast('✅ Dépôt validé et compte crédité', 'success');
+    renderDeposits(); renderDash();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function rejectDeposit(id) {
+  if (!confirm('Refuser ce dépôt ?')) return;
+  try {
+    await admin.rejectDeposit(id);
+    toast('Dépôt refusé', 'warn');
+    renderDeposits(); renderDash();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   RETRAITS
+   ============================================================ */
+async function renderWithdrawals() {
+  const tb = document.querySelector('#tblWd tbody');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px"><div class="loader"></div></td></tr>';
+  try {
+    const list = await admin.getWithdrawals();
+    const pending = list.filter(w => w.status === 'pending');
+    if (!pending.length) {
+      tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Aucun retrait en attente ✅</td></tr>';
+      return;
+    }
+    tb.innerHTML = pending.map(w => `
+      <tr>
+        <td style="font-family:monospace;font-size:12px">${w.id}</td>
+        <td>
+          <div style="font-weight:600">${w.userId?.nom || '?'}</div>
+          <div style="font-size:12px;color:var(--muted)">${w.userId?.email || ''}</div>
+        </td>
+        <td><b>${w.operator || '—'}</b></td>
+        <td style="font-family:monospace">${w.number || '—'}</td>
+        <td style="font-weight:800;color:var(--danger)">${fmtPi(Math.abs(w.amount))}</td>
+        <td>
+          <div class="action-cell">
+            <button class="btn btn-success btn-sm" onclick="approveWithdraw('${w.id}')">✅ Valider</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectWithdraw('${w.id}')">❌ Refuser</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:24px">Erreur</td></tr>';
+  }
+}
+
+async function approveWithdraw(id) {
+  if (!confirm('Valider ce retrait ? Confirmez avoir effectué le virement Mobile Money.')) return;
+  try {
+    await admin.approveWithdraw(id);
+    toast('✅ Retrait validé', 'success');
+    renderWithdrawals(); renderDash();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function rejectWithdraw(id) {
+  if (!confirm('Refuser ce retrait ? Le montant sera remboursé à l\'utilisateur.')) return;
+  try {
+    await admin.rejectWithdraw(id);
+    toast('Retrait refusé + remboursé', 'warn');
+    renderWithdrawals(); renderDash();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   UTILISATEURS
+   ============================================================ */
+async function renderUsers() {
+  const tb = document.querySelector('#tblUsers tbody');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px"><div class="loader"></div></td></tr>';
+  try {
+    const users = await admin.getUsers();
+    if (!users.length) {
+      tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Aucun utilisateur</td></tr>';
+      return;
+    }
+    tb.innerHTML = users.map(u => `
+      <tr>
+        <td style="font-weight:600">${u.nom || '—'}</td>
+        <td class="hide-mobile" style="font-size:12px">${u.email || ''}</td>
+        <td class="hide-mobile" style="font-size:12px">${u.tel || ''}</td>
+        <td style="font-weight:700;color:var(--primary)">${fmtPi(u.balance || 0)}</td>
+        <td>
+          ${u.suspended
+            ? '<span class="badge badge-fail">Suspendu</span>'
+            : (u.isPro ? '<span class="badge badge-pro">Pro</span>' : '<span class="badge badge-success">Actif</span>')}
+        </td>
+        <td>
+          <div class="action-cell">
+            <button class="btn btn-ghost btn-sm" onclick="toggleSuspend('${u._id}', ${u.suspended})">${u.suspended ? '↩️' : '⛔'}</button>
+            <button class="btn btn-warn btn-sm" onclick="addBalance('${u._id}')">+π</button>
+            <button class="btn btn-danger btn-sm" onclick="resetBalance('${u._id}')">0</button>
+            <button class="btn btn-primary btn-sm" onclick="togglePro('${u._id}')">${u.isPro ? '★' : '☆'}</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:24px">Erreur</td></tr>';
+  }
+}
+
+async function toggleSuspend(id, current) {
+  if (!confirm(current ? 'Réactiver ce compte ?' : 'Suspendre ce compte ?')) return;
+  try { await admin.suspend(id); toast('Statut modifié', 'success'); renderUsers(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+async function addBalance(id) {
+  const v = prompt('Montant à ajouter (π) :', '10');
+  if (!v || isNaN(v)) return;
+  try { await admin.addBalance(id, parseFloat(v)); toast('Solde augmenté', 'success'); renderUsers(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+async function resetBalance(id) {
+  if (!confirm('Remettre le solde à zéro ?')) return;
+  try { await admin.resetBalance(id); toast('Solde réinitialisé', 'warn'); renderUsers(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+async function togglePro(id) {
+  try { await admin.makePro(id); toast('Statut Pro modifié', 'success'); renderUsers(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   CAMPAGNES
+   ============================================================ */
+async function renderAdminCamps() {
+  const box = document.getElementById('adminCamps');
+  box.innerHTML = '<div class="loader" style="grid-column:1/-1"></div>';
+  try {
+    const list = await apiGetCampaigns('all');
+    if (!list.length) { box.innerHTML = '<p style="color:var(--muted)">Aucune campagne.</p>'; return; }
+    box.innerHTML = list.map(c => `
+      <div class="card">
+        <div style="font-size:26px">🏥</div>
+        <h3>${c.company}</h3>
+        <p style="font-size:13px">${(c.description || '').slice(0, 100)}...</p>
+        <div style="margin-top:10px;font-size:13px">
+          <span class="badge badge-pending">${c.category}</span>
+          <b style="color:var(--primary);margin-left:8px">${c.amountAsked} π → ${c.returnAmount} π</b>
+        </div>
+        <button class="btn btn-danger btn-sm" style="margin-top:12px" onclick="deleteCamp('${c.id}')">🗑️ Supprimer</button>
+      </div>`).join('');
+  } catch (e) { box.innerHTML = '<p>Erreur</p>'; }
+}
+
+async function deleteCamp(id) {
+  if (!confirm('Supprimer cette campagne ?')) return;
+  try { await admin.deleteCampaign(id); toast('Supprimée', 'warn'); renderAdminCamps(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+
+async function publishCampaign() {
+  const name = document.getElementById('cpName').value.trim();
+  const location = document.getElementById('cpLocation').value.trim();
+  const photosStr = document.getElementById('cpPhotos').value.trim();
+  const ask = parseFloat(document.getElementById('cpAsk').value);
+  const ret = parseFloat(document.getElementById('cpRet').value);
+  const cat = document.getElementById('cpCat').value;
+  const dur = parseInt(document.getElementById('cpDur').value);
+  const email = document.getElementById('cpEmail').value.trim();
+  const phone = document.getElementById('cpPhone').value.trim();
+  const desc = document.getElementById('cpDesc').value.trim();
+
+  if (!name || !ask || !ret || !desc) return toast('Remplissez les champs obligatoires', 'error');
+
+  const photos = photosStr ? photosStr.split(',').map(p => p.trim()).filter(Boolean) : ['🏥', '💊'];
+
+  try {
+    await admin.createCampaign({
+      company: name, location, photos, amountAsked: ask, returnAmount: ret,
+      category: cat, durationDays: dur, description: desc,
+      contactEmail: email, contactPhone: phone
+    });
+    toast('📢 Campagne publiée !', 'success');
+    ['cpName','cpLocation','cpPhotos','cpAsk','cpRet','cpDesc','cpEmail','cpPhone'].forEach(i => document.getElementById(i).value = '');
+    renderAdminCamps();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   MÈRES PORTEUSES
+   ============================================================ */
+async function renderSurrogates() {
+  const tb = document.querySelector('#tblSur tbody');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px"><div class="loader"></div></td></tr>';
+  try {
+    const list = await apiGetSurrogates();
+    tb.innerHTML = list.slice(0, 100).map(s => `
+      <tr>
+        <td style="font-family:monospace;font-size:12px">${s.id}</td>
+        <td style="font-weight:600">${s.name}</td>
+        <td>${s.country || '—'}</td>
+        <td>${s.verified ? '<span class="badge badge-success">Vérifié</span>' : '<span class="badge badge-pending">En attente</span>'}</td>
+        <td>${s.chosenCount || 0}</td>
+        <td>
+          <div class="action-cell">
+            <button class="btn btn-${s.verified?'warn':'success'} btn-sm" onclick="toggleVerify('${s.id}')">${s.verified?'↩️':'✅'}</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSur('${s.id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:24px">Erreur</td></tr>';
+  }
+}
+
+async function toggleVerify(id) {
+  try { await admin.verifySurrogate(id); toast('Statut modifié', 'success'); renderSurrogates(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+async function deleteSur(id) {
+  if (!confirm('Supprimer ce profil ?')) return;
+  try { await admin.deleteSurrogate(id); toast('Supprimé', 'warn'); renderSurrogates(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+
+async function importViaAI() {
+  const txt = document.getElementById('aiRawText').value.trim();
+  if (!txt || txt.length < 20) return toast('Collez un texte plus long', 'error');
+  try {
+    const s = await admin.aiImportSurrogate(txt);
+    toast('🤖 Profil créé : ' + s.id + ' (à vérifier)', 'success');
+    document.getElementById('aiRawText').value = '';
+    renderSurrogates();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+async function renderNotifs() {
+  const box = document.getElementById('notifList');
+  try {
+    const list = await admin.getUsers();
+    // On affiche juste un placeholder pour l'instant
+    box.innerHTML = '<p style="color:var(--muted);padding:20px">Les signalements apparaîtront ici.</p>';
+  } catch (e) { box.innerHTML = '<p>Erreur</p>'; }
+}
+
+async function sendNotif() {
+  const to = document.getElementById('notifTo').value.trim() || 'ALL';
+  const msg = document.getElementById('notifMsg').value.trim();
+  if (!msg) return toast('Écrivez un message', 'error');
+  try {
+    await admin.sendNotification(to, msg);
+    toast('📤 Notification envoyée', 'success');
+    document.getElementById('notifMsg').value = '';
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   CADEAUX
+   ============================================================ */
+async function sendGift() {
+  const email = document.getElementById('giftTo').value.trim();
+  const amt = parseFloat(document.getElementById('giftAmt').value);
+  if (!email || !amt) return toast('Remplissez tous les champs', 'error');
+  try {
+    await admin.gift(email, amt);
+    toast('🎁 Cadeau envoyé', 'success');
+    document.getElementById('giftTo').value = '';
+    document.getElementById('giftAmt').value = '';
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ============================================================
+   CHART
+   ============================================================ */
+let adminChart;
+async function drawChart() {
+  const ctx = document.getElementById('adminChart');
+  if (!ctx) return;
+  try {
+    const deps = await admin.getDeposits();
+    const days = [], vals = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000);
+      days.push(d.toLocaleDateString('fr-FR', { weekday: 'short' }));
+      vals.push(deps
+        .filter(x => x.status === 'success' && new Date(x.date).toDateString() === d.toDateString())
+        .reduce((s, x) => s + x.amount, 0));
+    }
+    if (adminChart) adminChart.destroy();
+    adminChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: days, datasets: [{ label: 'Dépôts (π)', data: vals, backgroundColor: '#7c3aed', borderRadius: 8 }] },
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+  } catch (e) { console.error(e); }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(async function init() {
+  renderDash();
+  renderDeposits();
+  renderWithdrawals();
+  renderUsers();
+  renderAdminCamps();
+  renderSurrogates();
+  renderNotifs();
+  setInterval(() => { renderDash(); renderDeposits(); renderWithdrawals(); }, 30000);
+})();
+</script>
+</body>
+</html>
